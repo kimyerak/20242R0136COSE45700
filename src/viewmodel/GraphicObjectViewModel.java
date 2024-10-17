@@ -1,5 +1,5 @@
 package viewmodel;
-import model.GraphicObject;  // GraphicObject 인터페이스가 정의된 경로를 임포트
+import model.GraphicObject;
 import java.awt.Graphics;
 
 public class GraphicObjectViewModel {
@@ -53,6 +53,10 @@ public class GraphicObjectViewModel {
             return "Text";
         }
         return "Unknown";
+    }
+    // GraphicObject 객체를 반환하는 메서드
+    public GraphicObject getGraphicObject() {
+        return graphicObject;
     }
 }
 
