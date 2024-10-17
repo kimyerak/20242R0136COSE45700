@@ -1,4 +1,6 @@
 package viewmodel;
+import model.GraphicObject;
+import model.TextObject;
 
 public class PropertyPanelViewModel {
     private GraphicObjectViewModel selectedObject;
@@ -41,7 +43,25 @@ public class PropertyPanelViewModel {
     public String getSelectedShapeType() {
         return selectedShapeType;
     }
+    // 텍스트 업데이트
+    public void updateText(String newText) {
+        if (selectedObject != null && selectedObject.getGraphicObject() instanceof TextObject) {
+            // selectedObject의 실제 객체가 TextObject인지 확인 후 캐스팅
+            TextObject textObject = (TextObject) selectedObject.getGraphicObject();
+            textObject.setText(newText);
+        } else {
+            System.out.println("Selected object is not a TextObject.");
+        }
+    }
 
+    // 텍스트 가져오기
+    public String getText() {
+        if (selectedObject != null && selectedObject.getGraphicObject() instanceof TextObject) {
+            TextObject textObject = (TextObject) selectedObject.getGraphicObject();
+            return textObject.getText();
+        }
+        return "";
+    }
 
 }
 

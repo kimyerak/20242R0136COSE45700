@@ -1,14 +1,18 @@
 package viewmodel;
 
+import model.TextObject;
+
 public class TextManipulator implements Manipulator {
     private Event downClickEvent;
     private Event dragEvent;
     private Event upClickEvent;
+    private TextObject textObject;
 
-    public TextManipulator(Event downClickEvent, Event dragEvent, Event upClickEvent) {
+    public TextManipulator(Event downClickEvent, Event dragEvent, Event upClickEvent, TextObject textObject) {
         this.downClickEvent = downClickEvent;
         this.dragEvent = dragEvent;
         this.upClickEvent = upClickEvent;
+        this.textObject = textObject;
     }
 
     @Override
@@ -27,5 +31,10 @@ public class TextManipulator implements Manipulator {
     public void upClick(int x, int y) {
         System.out.println("Text up click");
         upClickEvent.handle(x, y);
+    }
+    // 텍스트 수정
+    public void setText(String newText) {
+        textObject.setText(newText);
+        System.out.println("Text updated to: " + newText);
     }
 }

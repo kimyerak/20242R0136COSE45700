@@ -51,4 +51,11 @@ public class TextObject implements GraphicObject {
         // 텍스트는 한 줄로 가정하고 높이를 반환 (임의의 값)
         return 20;  // 기본 폰트 높이로 20픽셀로 가정
     }
+//텍스트 내용변경
+    public void setText(String newText) {
+        this.text = newText;
+    }
+    public String getText() {
+        return text;
+    }
 }
