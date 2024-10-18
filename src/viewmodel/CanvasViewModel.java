@@ -2,6 +2,7 @@ package viewmodel;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
+import model.*;
 
 public class CanvasViewModel {
     private List<GraphicObjectViewModel> graphicObjects;
@@ -31,7 +32,20 @@ public class CanvasViewModel {
     public void addGraphicObject(GraphicObjectViewModel object) {
         graphicObjects.add(object);
     }
-
+    public void addGraphicObjectByShapeType(String shapeType) {
+        switch (shapeType) {
+            case "Rectangle":
+                this.addGraphicObject(new GraphicObjectViewModel(new Rectangle(50, 50, 100, 100)));
+                break;
+            case "Ellipse":
+                this.addGraphicObject(new GraphicObjectViewModel(new Ellipse(200, 100, 150, 80)));
+                break;
+            case "Text":
+                this.addGraphicObject(new GraphicObjectViewModel(new TextObject(300, 200, "Sample Text")));
+                break;
+            // 필요한 경우 다른 도형도 추가
+        }
+    }
     // 그래픽 객체 목록을 가져옴
     public List<GraphicObjectViewModel> getGraphicObjects() {
         return graphicObjects;
