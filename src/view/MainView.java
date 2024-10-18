@@ -18,7 +18,7 @@ public class MainView extends JFrame {
         // 캔버스, 속성 창, 도형 선택 툴바 초기화
         canvasView = new CanvasView(canvasViewModel);
         propertyPanelView = new PropertyPanelView(propertyPanelViewModel);
-        shapeToolbarView = new ShapeToolbarView(propertyPanelViewModel);
+        shapeToolbarView = new ShapeToolbarView(propertyPanelViewModel, canvasViewModel);
 
         // 캔버스, 속성 패널, 도형 선택 툴바를 레이아웃에 배치
         this.setLayout(new BorderLayout());
