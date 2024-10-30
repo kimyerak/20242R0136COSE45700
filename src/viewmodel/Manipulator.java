@@ -1,3 +1,4 @@
+//viewmodel/manipulator.java
 package viewmodel;
 
 public interface Manipulator {

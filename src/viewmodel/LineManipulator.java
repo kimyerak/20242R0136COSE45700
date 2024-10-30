@@ -5,11 +5,6 @@ public class LineManipulator implements Manipulator {
     private Event dragEvent;
     private Event upClickEvent;
 
-    public LineManipulator(Event downClickEvent, Event dragEvent, Event upClickEvent) {
-        this.downClickEvent = downClickEvent;
-        this.dragEvent = dragEvent;
-        this.upClickEvent = upClickEvent;
-    }
 
     @Override
     public void downClick(int x, int y) {

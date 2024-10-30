@@ -8,12 +8,6 @@ public class TextManipulator implements Manipulator {
     private Event upClickEvent;
     private TextObject textObject;
 
-    public TextManipulator(Event downClickEvent, Event dragEvent, Event upClickEvent, TextObject textObject) {
-        this.downClickEvent = downClickEvent;
-        this.dragEvent = dragEvent;
-        this.upClickEvent = upClickEvent;
-        this.textObject = textObject;
-    }
 
     @Override
     public void downClick(int x, int y) {
