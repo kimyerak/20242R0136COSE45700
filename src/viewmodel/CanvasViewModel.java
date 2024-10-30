@@ -43,6 +43,9 @@ public class CanvasViewModel {
             case "Text":
                 this.addGraphicObject(new GraphicObjectViewModel(new TextObject(300, 200, "Sample Text")));
                 break;
+            case "Line":
+                this.addGraphicObject(new GraphicObjectViewModel(new Line(100, 100, 200, 200))); // 기본 시작, 끝 좌표
+                break;
             // 필요한 경우 다른 도형도 추가
         }
     }
