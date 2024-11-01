@@ -1,8 +1,8 @@
 package view;
 
 import viewmodel.CanvasViewModel;
-import java.awt.Graphics;
-import javax.swing.JPanel;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -17,11 +17,14 @@ public class CanvasView extends JPanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 canvasViewModel.handleMousePressed(e.getX(), e.getY(), e.getButton());
+                SwingUtilities.getWindowAncestor(CanvasView.this).repaint();
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
+
                 canvasViewModel.handleMouseReleased(e.getX(), e.getY());
+                repaint();
             }
         });
 
@@ -42,6 +45,7 @@ public class CanvasView extends JPanel {
 
     // 캔버스를 다시 그리기 위한 메서드
     public void updateCanvas() {
+
         repaint();  // 캔버스를 다시 그리도록 요청
     }
 

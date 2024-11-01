@@ -2,7 +2,7 @@ package viewmodel;
 import model.GraphicObject;
 import model.TextObject;
 
-public class PropertyPanelViewModel {
+public class PropertyPanelViewModel implements CanvasObserver{
     private GraphicObjectViewModel selectedObject;
     private String selectedShapeType = "Rectangle"; // 처음 기본 도형 타입
 
@@ -33,7 +33,25 @@ public class PropertyPanelViewModel {
                 ", Width: " + selectedObject.getWidth() +
                 ", Height: " + selectedObject.getHeight();
     }
+    // 선택된 객체의 X 좌표 가져오기
+    public int getSelectedObjectX() {
+        return selectedObject != null ? selectedObject.getX() : 0;
+    }
 
+    // 선택된 객체의 Y 좌표 가져오기
+    public int getSelectedObjectY() {
+        return selectedObject != null ? selectedObject.getY() : 0;
+    }
+
+    // 선택된 객체의 너비 가져오기
+    public int getSelectedObjectWidth() {
+        return selectedObject != null ? selectedObject.getWidth() : 0;
+    }
+
+    // 선택된 객체의 높이 가져오기
+    public int getSelectedObjectHeight() {
+        return selectedObject != null ? selectedObject.getHeight() : 0;
+    }
     // 도형 타입 설정
     public void setSelectedShapeType(String shapeType) {
         this.selectedShapeType = shapeType;
@@ -61,6 +79,17 @@ public class PropertyPanelViewModel {
             return textObject.getText();
         }
         return "";
+    }
+    @Override
+    public void onCanvasChanged() {
+        if (selectedObject != null) {
+            // 선택된 객체가 있을 경우, 해당 객체의 타입과 속성 정보 갱신
+            selectedShapeType = selectedObject.getGraphicObjectType();
+        } else {
+            // 선택된 객체가 없을 경우, 기본 메시지 설정
+            selectedShapeType = "No object selected";
+        }
+        // 여기서 GUI를 갱신하도록 이벤트 발생 (필요 시 PropertyPanelView에 직접 알림)
     }
 
 }

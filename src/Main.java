@@ -5,15 +5,17 @@
 //}
 
 import view.MainView;
+import view.PropertyPanelView;
 import viewmodel.CanvasViewModel;
 import viewmodel.PropertyPanelViewModel;
 import viewmodel.GraphicObjectViewModel;
 
 public class Main {
     public static void main(String[] args) {
-        // ViewModel 인스턴스 생성
-        CanvasViewModel canvasViewModel = new CanvasViewModel();
         PropertyPanelViewModel propertyPanelViewModel = new PropertyPanelViewModel();
+        CanvasViewModel canvasViewModel = new CanvasViewModel(propertyPanelViewModel); // 새로운 생성자 사용
+
+        PropertyPanelView propertyPanelView = new PropertyPanelView(propertyPanelViewModel);
 
         // 초기 그래픽 객체 추가 (예시로 간단히 몇 개 추가)
         canvasViewModel.addGraphicObject(new GraphicObjectViewModel(new model.Rectangle(50, 50, 100, 100)));
@@ -25,6 +27,6 @@ public class Main {
         MainView mainView = new MainView(canvasViewModel, propertyPanelViewModel);
 
         // 애플리케이션 실행 후, 필요 시 View 업데이트
-        // mainView.updateView();  // 사용자가 상호작용할 때 적절히 호출 가능
+        mainView.updateView();  // 사용자가 상호작용할 때 적절히 호출 가능
     }
 }
