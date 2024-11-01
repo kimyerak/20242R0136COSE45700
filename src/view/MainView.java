@@ -2,8 +2,9 @@ package view;
 
 import viewmodel.CanvasViewModel;
 import viewmodel.PropertyPanelViewModel;
-import javax.swing.JFrame;
-import java.awt.BorderLayout;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class MainView extends JFrame {
     private CanvasView canvasView;

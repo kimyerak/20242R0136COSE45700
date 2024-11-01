@@ -7,11 +7,14 @@ import model.*;
 public class CanvasViewModel {
     private List<GraphicObjectViewModel> graphicObjects;
     private GraphicObjectViewModel selectedObject = null;  // 선택된 도형
+    private List<CanvasObserver> observers = new ArrayList<>();  // 옵저버 목록
+
     private int prevX, prevY;  // 마우스 이전 좌표
 
     private Event downClickEvent;
     private Event dragEvent;
     private Event upClickEvent;
+    private PropertyPanelViewModel propertyPanelViewModel;
 
     // 기본 생성자: 빈 리스트로 초기화
     public CanvasViewModel() {
@@ -21,12 +24,15 @@ public class CanvasViewModel {
         this.upClickEvent = new UpClickEvent(this);
     }
 
-    public CanvasViewModel(List<GraphicObjectViewModel> graphicObjects) {
-        this.graphicObjects = graphicObjects;
+    public CanvasViewModel(PropertyPanelViewModel propertyPanelViewModel) {
+        this.graphicObjects = new ArrayList<>();
         this.downClickEvent = new DownClickEvent(this);
         this.dragEvent = new DragEvent(this);
         this.upClickEvent = new UpClickEvent(this);
+        this.addObserver(propertyPanelViewModel);
+        this.propertyPanelViewModel = propertyPanelViewModel;
     }
+
 
     // 그래픽 객체 추가
     public void addGraphicObject(GraphicObjectViewModel object) {
@@ -78,9 +84,28 @@ public class CanvasViewModel {
         upClickEvent.handle(x, y);  // UpClickEvent 호출
     }
 
-    // 선택된 도형 찾기
+    // 옵저버 등록 메서드
+    public void addObserver(CanvasObserver observer) {
+        observers.add(observer);
+    }
+
+    // 옵저버에게 변경 사항 알림
+    private void notifyObservers() {
+        for (CanvasObserver observer : observers) {
+            observer.onCanvasChanged();
+        }
+    }
+    // 선택된 도형 뭔지 전달
     public void selectObjectAt(int x, int y) {
+
         selectedObject = findObjectAt(x, y);
+        propertyPanelViewModel.setSelectedObject(selectedObject);
+        notifyObservers();
+    }
+
+    // 선택된 객체 반환 (PropertyPanelViewModel에서 사용)
+    public GraphicObjectViewModel getSelectedObject() {
+        return selectedObject;
     }
 
     // 선택된 도형 이동
@@ -89,6 +114,11 @@ public class CanvasViewModel {
             int deltaX = x - prevX;
             int deltaY = y - prevY;
             selectedObject.move(selectedObject.getX() + deltaX, selectedObject.getY() + deltaY);
+            prevX = x;
+            prevY = y;
+
+            // 옵저버들에게 이동 후 상태를 알림
+            notifyObservers();
         }
     }
 
@@ -107,4 +137,6 @@ public class CanvasViewModel {
         }
         return null;
     }
+
+
 }
