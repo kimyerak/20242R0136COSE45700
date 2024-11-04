@@ -49,8 +49,12 @@ public class GraphicObjectViewModel {
             return "Rectangle";
         } else if (graphicObject instanceof model.Ellipse) {
             return "Ellipse";
+        } else if (graphicObject instanceof model.Line) {
+            return "Line";
         } else if (graphicObject instanceof model.TextObject) {
-            return "Text";
+            return "TextObject";
+        } else if (graphicObject instanceof model.ImageObject) {
+            return "ImageObject";
         }
         return "Unknown";
     }

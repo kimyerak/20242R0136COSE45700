@@ -23,7 +23,8 @@ public class ShapeToolbarView extends JPanel {
         JButton lineButton = createShapeButton("Line", Color.BLUE);
         JButton rectangleButton = createShapeButton("Rectangle", Color.RED);
         JButton ellipseButton = createShapeButton("Ellipse", Color.GREEN);
-        JButton textButton = createShapeButton("Text", Color.MAGENTA);
+        JButton textButton = createShapeButton("TextObject", Color.MAGENTA);
+        JButton imageButton = createShapeButton("Image", Color.BLACK);
 
         // 패널에 버튼 추가
         this.add(clickButton);
@@ -31,6 +32,7 @@ public class ShapeToolbarView extends JPanel {
         this.add(rectangleButton);
         this.add(ellipseButton);
         this.add(textButton);
+        this.add(imageButton);
     }
 
     private JButton createShapeButton(String shapeType, Color color) {
@@ -45,7 +47,11 @@ public class ShapeToolbarView extends JPanel {
 
     // 선택한 도형 타입을 CanvasViewModel에 전달
     private void selectShape(String shapeType) {
-        propertyPanelViewModel.setSelectedShapeType(shapeType);
-        canvasViewModel.addGraphicObjectByShapeType(shapeType); // shapeType을 기반으로 객체 추가
+        if (shapeType.equals("Image")) {
+            canvasViewModel.loadImage();
+        } else {
+            propertyPanelViewModel.setSelectedShapeType(shapeType);
+            canvasViewModel.addGraphicObjectByShapeType(shapeType); // shapeType을 기반으로 객체 추가
+        }
     }
 }

@@ -10,6 +10,6 @@ public class UpClickEvent implements Event {
 
     @Override
     public void handle(int x, int y) {
-        canvasViewModel.deselectObject();  // 선택된 도형 해제
+        canvasViewModel.selectObjectAt(x, y);  // 선택된 도형 해제
     }
 }

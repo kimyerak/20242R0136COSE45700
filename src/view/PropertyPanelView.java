@@ -17,6 +17,7 @@ public class PropertyPanelView extends JPanel implements CanvasObserver {
     private JTextField textField;
     private JButton confirmButton;
     private JButton cancelButton;
+    private JButton selectButton;
 
     public PropertyPanelView(PropertyPanelViewModel propertyPanelViewModel) {
         this.propertyPanelViewModel = propertyPanelViewModel;
@@ -51,16 +52,21 @@ public class PropertyPanelView extends JPanel implements CanvasObserver {
 
         confirmButton = new JButton("확인");
         cancelButton = new JButton("취소");
+        selectButton = new JButton("선택");
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(confirmButton);
-        buttonPanel.add(cancelButton);
+        JPanel buttonPanel_1 = new JPanel();
+        buttonPanel_1.add(confirmButton);
+        buttonPanel_1.add(cancelButton);
+
+        JPanel buttonPanel_2 = new JPanel();
+        buttonPanel_2.add(selectButton);
 
         // 필드 및 버튼 추가
         this.add(positionPanel);
         this.add(sizePanel);
         this.add(textPanel);
-        this.add(buttonPanel);
+        this.add(buttonPanel_1);
+        this.add(buttonPanel_2);
 
         registerButtonEvents();
         updateProperties();  // 초기 상태 설정
@@ -72,38 +78,34 @@ public class PropertyPanelView extends JPanel implements CanvasObserver {
 
     // 속성 패널을 뷰모델의 데이터로 업데이트
     public void updateProperties() {
-        // 선택된 객체 타입 가져오기
-        String selectedType = propertyPanelViewModel.getSelectedShapeType();
+        SwingUtilities.invokeLater(() -> {
+            String selectedType = propertyPanelViewModel.getSelectedShapeType();
 
-        if (!selectedType.equals("No object selected")) {
-            // 선택된 객체가 있을 경우
-            objectTypeLabel.setText(selectedType);
-
-            // 위치 및 크기 설정
-            xField.setText(String.valueOf(propertyPanelViewModel.getSelectedObjectX()));
-            yField.setText(String.valueOf(propertyPanelViewModel.getSelectedObjectY()));
-            widthField.setText(String.valueOf(propertyPanelViewModel.getSelectedObjectWidth()));
-            heightField.setText(String.valueOf(propertyPanelViewModel.getSelectedObjectHeight()));
-
-            // 텍스트 객체일 경우 텍스트 필드 활성화
-            if (selectedType.equals("TextObject")) {
-                textField.setEnabled(true);
-                textField.setText(propertyPanelViewModel.getText());
+            if (!selectedType.equals("No object selected")) {
+                objectTypeLabel.setText(selectedType);
+                xField.setText(String.valueOf(propertyPanelViewModel.getSelectedObjectX()));
+                yField.setText(String.valueOf(propertyPanelViewModel.getSelectedObjectY()));
+                widthField.setText(String.valueOf(propertyPanelViewModel.getSelectedObjectWidth()));
+                heightField.setText(String.valueOf(propertyPanelViewModel.getSelectedObjectHeight()));
+                if (selectedType.equals("TextObject")) {
+                    textField.setEnabled(true);
+                    textField.setText(propertyPanelViewModel.getText());
+                } else {
+                    textField.setEnabled(false);
+                    textField.setText("");
+                }
             } else {
-                textField.setEnabled(false);
+                objectTypeLabel.setText("No object selected");
+                xField.setText("");
+                yField.setText("");
+                widthField.setText("");
+                heightField.setText("");
                 textField.setText("");
+                textField.setEnabled(false);
             }
-        } else {
-            // 선택된 객체가 없을 경우 기본 상태로 설정
-            objectTypeLabel.setText("No object selected");
-            xField.setText("");
-            yField.setText("");
-            widthField.setText("");
-            heightField.setText("");
-            textField.setText("");
-            textField.setEnabled(false);
-        }
+        });
     }
+
     private void registerButtonEvents() {
         confirmButton.addActionListener(new ActionListener() {
             @Override
@@ -129,8 +131,15 @@ public class PropertyPanelView extends JPanel implements CanvasObserver {
         cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                updateProperties();  // 현재 선택된 객체의 속성으로 초기화
+                updateProperties(); // 새로운 메서드 호출
                 JOptionPane.showMessageDialog(null, "Canceled.");
+            }
+        });
+
+        selectButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateProperties(); // 새로운 메서드 호출
             }
         });
     }

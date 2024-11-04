@@ -1,8 +1,16 @@
 package viewmodel;
-import java.awt.Graphics;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import model.*; // Import model classes
+import model.Rectangle;
+import view.PropertyPanelView;
+
 import java.util.ArrayList;
 import java.util.List;
-import model.*;
 
 public class CanvasViewModel {
     private List<GraphicObjectViewModel> graphicObjects;
@@ -14,6 +22,7 @@ public class CanvasViewModel {
     private Event downClickEvent;
     private Event dragEvent;
     private Event upClickEvent;
+    private PropertyPanelView propertyPanelView;
     private PropertyPanelViewModel propertyPanelViewModel;
 
     // 기본 생성자: 빈 리스트로 초기화
@@ -33,6 +42,22 @@ public class CanvasViewModel {
         this.propertyPanelViewModel = propertyPanelViewModel;
     }
 
+    public void loadImage() {
+        JFileChooser fileChooser = new JFileChooser();
+        int result = fileChooser.showOpenDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            try {
+                Image image = ImageIO.read(file);
+                ImageObject imageObject = new ImageObject(50, 50, 100, 100, file.getAbsolutePath()); // Default size and position
+                addGraphicObject(new GraphicObjectViewModel(imageObject));
+                notifyObservers(); // Notify to refresh the canvas
+            } catch (IOException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Failed to load image.");
+            }
+        }
+    }
 
     // 그래픽 객체 추가
     public void addGraphicObject(GraphicObjectViewModel object) {
@@ -46,7 +71,7 @@ public class CanvasViewModel {
             case "Ellipse":
                 this.addGraphicObject(new GraphicObjectViewModel(new Ellipse(200, 100, 150, 80)));
                 break;
-            case "Text":
+            case "TextObject":
                 this.addGraphicObject(new GraphicObjectViewModel(new TextObject(300, 200, "Sample Text")));
                 break;
             case "Line":
@@ -95,11 +120,12 @@ public class CanvasViewModel {
             observer.onCanvasChanged();
         }
     }
+
     // 선택된 도형 뭔지 전달
     public void selectObjectAt(int x, int y) {
-
         selectedObject = findObjectAt(x, y);
         propertyPanelViewModel.setSelectedObject(selectedObject);
+
         notifyObservers();
     }
 
