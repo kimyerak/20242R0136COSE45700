@@ -10,6 +10,15 @@ public class DownClickEvent implements Event {
 
     @Override
     public void handle(int x, int y) {
-        canvasViewModel.selectObjectAt(x, y);  // 도형 선택
+        GraphicObjectViewModel clickedObject = canvasViewModel.findObjectAt(x, y);
+
+        if (clickedObject != null) {
+            if (!canvasViewModel.isObjectSelected(clickedObject)) {
+                canvasViewModel.deselectAllObjects();
+                canvasViewModel.selectSingleObject(clickedObject);
+            }
+        } else {
+            canvasViewModel.deselectAllObjects();
+        }
     }
 }

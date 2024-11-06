@@ -1,4 +1,3 @@
-//viewmodel/dragEvent.java
 package viewmodel;
 
 public class DragEvent implements Event {
@@ -10,6 +9,10 @@ public class DragEvent implements Event {
 
     @Override
     public void handle(int x, int y) {
-        canvasViewModel.moveSelectedObject(x, y);  // 선택된 도형 이동
+        int deltaX = x - canvasViewModel.prevX;
+        int deltaY = y - canvasViewModel.prevY;
+        canvasViewModel.moveSelectedObjects(deltaX, deltaY);
+        canvasViewModel.prevX = x;
+        canvasViewModel.prevY = y;
     }
 }
