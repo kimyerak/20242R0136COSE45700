@@ -4,7 +4,7 @@ import model.TextObject;
 
 public class PropertyPanelViewModel implements CanvasObserver{
     private GraphicObjectViewModel selectedObject;
-    private String selectedShapeType = "Rectangle"; // 처음 기본 도형 타입
+    private String selectedShapeType = "No object selected"; // 처음 기본 도형 타입
 
     // 선택된 객체 설정
     public void setSelectedObject(GraphicObjectViewModel object) {

@@ -1,6 +1,6 @@
 package model;
 
-import java.awt.Graphics;
+import java.awt.*;
 
 public class TextObject implements GraphicObject {
     private int x, y; // 텍스트의 위치
@@ -14,9 +14,14 @@ public class TextObject implements GraphicObject {
 
     @Override
     public void draw(Graphics g) {
-        System.out.println("Drawing text '" + text + "' at (" + x + ", " + y + ")");
-        // 실제 텍스트 그리기 (Graphics 객체 사용)
-        g.drawString(text, x, y);
+        // 텍스트 크기 측정
+        FontMetrics metrics = g.getFontMetrics(g.getFont());
+        int textHeight = metrics.getHeight(); // 텍스트의 높이
+
+        int centerY = y + textHeight;
+
+        System.out.println("Drawing text '" + text + "' at center (" + x + ", " + y + ")");
+        g.drawString(text, x, centerY);
     }
 
     @Override

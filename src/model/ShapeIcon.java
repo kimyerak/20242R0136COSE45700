@@ -38,8 +38,11 @@ public class ShapeIcon implements Icon {
             case "Line":
                 g.drawLine(x, y, x + width, y + height);
                 break;
-            case "Text":
-                g.drawString("T", x + width / 4, y + height / 2 + 4);
+            case "TextObject":
+                g.drawString("Text", x, y + height / 2 + 4);
+                break;
+            case "Image":
+                g.drawString("Image", x, y + height / 2 + 4);
                 break;
             case "Click":
                 g.fillPolygon(

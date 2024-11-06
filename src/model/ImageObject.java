@@ -1,17 +1,17 @@
+// model/ImageObject.java
 package model;
 
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class ImageObject implements GraphicObject {
-    private int x, y; // 이미지의 위치
-    private int width, height; // 이미지의 크기
-    private String imagePath; // 이미지 파일 경로
-    private Image image; // 실제 이미지 객체
+    private int x, y; // Image position
+    private int width, height; // Image dimensions
+    private String imagePath; // Image file path
+    private Image image; // Actual image object
 
     public ImageObject(int x, int y, int width, int height, String imagePath) {
         this.x = x;
@@ -20,7 +20,7 @@ public class ImageObject implements GraphicObject {
         this.height = height;
         this.imagePath = imagePath;
 
-        // 이미지 로드 시도
+        // Attempt to load the image
         try {
             this.image = ImageIO.read(new File(imagePath));
         } catch (IOException e) {
@@ -32,8 +32,7 @@ public class ImageObject implements GraphicObject {
     @Override
     public void draw(Graphics g) {
         if (image != null) {
-            System.out.println("Drawing an image at (" + x + ", " + y + ") with width " + width + " and height " + height + " from path: " + imagePath);
-            g.drawImage(image, x, y, width, height, null); // 이미지를 그리기
+            g.drawImage(image, x, y, width, height, null); // Draw image
         } else {
             System.out.println("Failed to load image: " + imagePath);
         }

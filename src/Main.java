@@ -16,6 +16,7 @@ public class Main {
         CanvasViewModel canvasViewModel = new CanvasViewModel(propertyPanelViewModel); // 새로운 생성자 사용
 
         PropertyPanelView propertyPanelView = new PropertyPanelView(propertyPanelViewModel);
+        canvasViewModel.addObserver(propertyPanelView);
 
         // 초기 그래픽 객체 추가 (예시로 간단히 몇 개 추가)
         canvasViewModel.addGraphicObject(new GraphicObjectViewModel(new model.Rectangle(50, 50, 100, 100)));
