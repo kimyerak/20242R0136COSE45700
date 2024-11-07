@@ -14,7 +14,6 @@ public class PropertyPanelView extends JPanel implements CanvasObserver {
     private JTextField yField;
     private JTextField widthField;
     private JTextField heightField;
-    private JTextField textField;
     private JButton confirmButton;
     private JButton cancelButton;
     private JButton selectButton;
@@ -32,7 +31,6 @@ public class PropertyPanelView extends JPanel implements CanvasObserver {
         yField = new JTextField(5);
         widthField = new JTextField(5);
         heightField = new JTextField(5);
-        textField = new JTextField(10);
 
         JPanel positionPanel = new JPanel();
         positionPanel.add(new JLabel("X:"));
@@ -45,10 +43,6 @@ public class PropertyPanelView extends JPanel implements CanvasObserver {
         sizePanel.add(widthField);
         sizePanel.add(new JLabel("Height:"));
         sizePanel.add(heightField);
-
-        JPanel textPanel = new JPanel();
-        textPanel.add(new JLabel("Text:"));
-        textPanel.add(textField);
 
         confirmButton = new JButton("확인");
         cancelButton = new JButton("취소");
@@ -64,7 +58,6 @@ public class PropertyPanelView extends JPanel implements CanvasObserver {
         // 필드 및 버튼 추가
         this.add(positionPanel);
         this.add(sizePanel);
-        this.add(textPanel);
         this.add(buttonPanel_1);
         this.add(buttonPanel_2);
 
@@ -87,21 +80,12 @@ public class PropertyPanelView extends JPanel implements CanvasObserver {
                 yField.setText(String.valueOf(propertyPanelViewModel.getSelectedObjectY()));
                 widthField.setText(String.valueOf(propertyPanelViewModel.getSelectedObjectWidth()));
                 heightField.setText(String.valueOf(propertyPanelViewModel.getSelectedObjectHeight()));
-                if (selectedType.equals("TextObject")) {
-                    textField.setEnabled(true);
-                    textField.setText(propertyPanelViewModel.getText());
-                } else {
-                    textField.setEnabled(false);
-                    textField.setText("");
-                }
             } else {
                 objectTypeLabel.setText("No object selected");
                 xField.setText("");
                 yField.setText("");
                 widthField.setText("");
                 heightField.setText("");
-                textField.setText("");
-                textField.setEnabled(false);
             }
         });
     }
@@ -116,10 +100,6 @@ public class PropertyPanelView extends JPanel implements CanvasObserver {
                     int width = Integer.parseInt(widthField.getText());
                     int height = Integer.parseInt(heightField.getText());
                     propertyPanelViewModel.updatePositionAndSize(x, y, width, height);
-
-                    if (textField.isEnabled()) {
-                        propertyPanelViewModel.updateText(textField.getText());
-                    }
 
                     JOptionPane.showMessageDialog(null, "Object updated.");
                 } catch (NumberFormatException ex) {

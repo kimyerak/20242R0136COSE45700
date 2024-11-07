@@ -86,7 +86,7 @@
                     this.addGraphicObject(new GraphicObjectViewModel(new Ellipse(200, 100, 150, 80)));
                     break;
                 case "TextObject":
-                    this.addGraphicObject(new GraphicObjectViewModel(new TextObject(300, 200, "Sample Text")));
+                    this.addGraphicObject(new GraphicObjectViewModel(new TextObject(300, 200, "Text")));
                     break;
                 case "Line":
                     this.addGraphicObject(new GraphicObjectViewModel(new Line(100, 100, 200, 200))); // 기본 시작, 끝 좌표
@@ -109,6 +109,14 @@
                     g2d.setColor(Color.BLUE);
                     g2d.setStroke(new BasicStroke(2)); // Thicker border for selection
                     g2d.drawRect(object.getX(), object.getY(), object.getWidth(), object.getHeight());
+                }
+            }
+        }
+
+        public void render(Graphics g, TextObject excludeObject) {
+            for (GraphicObjectViewModel object : graphicObjects) {
+                if (object.getGraphicObject() != excludeObject) {
+                    object.draw(g);
                 }
             }
         }
@@ -212,6 +220,29 @@
         public void deselectAllObjects() {
             selectedObjects.clear();
             notifyObservers();
+        }
+
+        public TextObject findTextObjectAt(int x, int y) {
+            for (GraphicObjectViewModel objectViewModel : graphicObjects) {
+                // Access the wrapped graphic object inside GraphicObjectViewModel
+                GraphicObject graphicObject = objectViewModel.getGraphicObject();
+
+                // Check if the graphic object is a TextObject
+                if (graphicObject instanceof TextObject) {
+                    TextObject textObject = (TextObject) graphicObject;
+
+                    // Check if (x, y) falls within the bounds of the textObject
+                    if (x >= textObject.getX() && x <= textObject.getX() + textObject.getWidth() &&
+                            y >= textObject.getY() && y <= textObject.getY() + textObject.getHeight()) {
+                        return textObject;
+                    }
+                }
+            }
+            return null; // Return null if no TextObject is found at (x, y)
+        }
+
+        public void updateTextObject(TextObject textObject) {
+            notifyObservers(); // Refresh the canvas after text change
         }
 
         // 좌표에 있는 도형을 찾아 반환하는 메서드
