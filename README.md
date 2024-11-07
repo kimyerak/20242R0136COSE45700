@@ -1,5 +1,35 @@
 # 디자인 패턴을 적용한 벡터 그래픽 에디터 (개발중)
-- MVVM
+### MVVM 파일구조
+src
+├── model
+│   ├── Ellipse
+│   ├── GraphicObject
+│   ├── ImageObject
+│   ├── Line
+│   ├── Picture
+│   ├── Rectangle
+│   ├── Shape
+│   ├── ShapeIcon
+│   └── TextObject
+├── view
+│   ├── CanvasView
+│   ├── MainView
+│   ├── PropertyPanelView
+│   └── ShapeToolbarView
+└── viewmodel
+    ├── CanvasObserver
+    ├── CanvasViewModel
+    ├── DownClickEvent
+    ├── DragEvent
+    ├── Event
+    ├── GraphicObjectViewModel
+    ├── LineManipulator
+    ├── Manipulator
+    ├── PropertyPanelViewModel
+    ├── TextManipulator
+    └── UpClickEvent
+
+
 ### observer + composite pattern 적용🍀
 이 프로젝트는 Observer Pattern과 Composite Pattern이 모두 적용된 구조로, 두 패턴을 함께 사용하는 복합적인 디자인이 현재 프로젝트에 적용된 상태입니다.
 
