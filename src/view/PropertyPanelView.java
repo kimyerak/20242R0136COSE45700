@@ -78,11 +78,15 @@ public class PropertyPanelView extends JPanel implements CanvasObserver {
 
     // 속성 패널을 뷰모델의 데이터로 업데이트
     public void updateProperties() {
-        SwingUtilities.invokeLater(() -> {
+
             String selectedType = propertyPanelViewModel.getSelectedShapeType();
+            System.out.println("클릭된 properties: " + selectedType);
 
             if (!selectedType.equals("No object selected")) {
+                System.out.println("UpdateProperties에서 case1");
                 objectTypeLabel.setText(selectedType);
+                objectTypeLabel.revalidate();
+                objectTypeLabel.repaint();
                 xField.setText(String.valueOf(propertyPanelViewModel.getSelectedObjectX()));
                 yField.setText(String.valueOf(propertyPanelViewModel.getSelectedObjectY()));
                 widthField.setText(String.valueOf(propertyPanelViewModel.getSelectedObjectWidth()));
@@ -95,6 +99,7 @@ public class PropertyPanelView extends JPanel implements CanvasObserver {
                     textField.setText("");
                 }
             } else {
+                System.out.println("UpdateProperties에서 case2");
                 objectTypeLabel.setText("No object selected");
                 xField.setText("");
                 yField.setText("");
@@ -103,8 +108,10 @@ public class PropertyPanelView extends JPanel implements CanvasObserver {
                 textField.setText("");
                 textField.setEnabled(false);
             }
-        });
+
     }
+
+
 
     private void registerButtonEvents() {
         confirmButton.addActionListener(new ActionListener() {

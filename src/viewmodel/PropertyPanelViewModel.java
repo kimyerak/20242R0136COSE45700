@@ -1,18 +1,33 @@
 package viewmodel;
 import model.GraphicObject;
 import model.TextObject;
+import view.PropertyPanelView;
 
 public class PropertyPanelViewModel implements CanvasObserver{
     private GraphicObjectViewModel selectedObject;
     private String selectedShapeType = "No object selected"; // 처음 기본 도형 타입
+    private PropertyPanelView propertyPanelView;
+
+    public PropertyPanelViewModel() {
+        this.propertyPanelView = null; // PropertyPanelView를 나중에 설정할 수 있도록 초기화
+    }
+
+    // 기존 PropertyPanelView를 받는 생성자
+    public PropertyPanelViewModel(PropertyPanelView propertyPanelView) {
+        this.propertyPanelView = propertyPanelView;
+    }
 
     // 선택된 객체 설정
     public void setSelectedObject(GraphicObjectViewModel object) {
         this.selectedObject = object;
         // 객체에 따라 타입 설정
         if (object != null) {
+            System.out.println("setSelectedText에서 널이 아님!!!!!!!!!!!!!!!");
             selectedShapeType = object.getGraphicObjectType();
+        }else {
+            selectedShapeType = "No object selected";
         }
+        onCanvasChanged();
     }
 
     // 선택된 객체의 위치 및 크기 속성 업데이트
@@ -82,15 +97,24 @@ public class PropertyPanelViewModel implements CanvasObserver{
     }
     @Override
     public void onCanvasChanged() {
+        System.out.println("onCanvasChanged called in PropertyPanelViewModel");
         if (selectedObject != null) {
-            // 선택된 객체가 있을 경우, 해당 객체의 타입과 속성 정보 갱신
+            System.out.println("OnCanvasChanged에서 널이 아님!!!!!!");
             selectedShapeType = selectedObject.getGraphicObjectType();
         } else {
             // 선택된 객체가 없을 경우, 기본 메시지 설정
             selectedShapeType = "No object selected";
         }
         // 여기서 GUI를 갱신하도록 이벤트 발생 (필요 시 PropertyPanelView에 직접 알림)
+        // 콘솔 로그에 출력
+        System.out.println(selectedShapeType);
+
+        // PropertyPanelView를 통해 화면에 출력
+        if (propertyPanelView != null) {
+            propertyPanelView.updateProperties(); // updateProperties 메서드를 통해 화면에 표시
+        }
     }
+
 
 }
 
