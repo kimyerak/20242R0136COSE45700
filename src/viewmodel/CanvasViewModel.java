@@ -193,21 +193,29 @@
         public void selectObjectsInArea(int startX, int startY, int endX, int endY) {
             selectedObjects.clear(); // Clear previous selections
 
-            // Calculate selection bounds
+            // Calculate the selection bounds
             int minX = Math.min(startX, endX);
             int minY = Math.min(startY, endY);
             int maxX = Math.max(startX, endX);
             int maxY = Math.max(startY, endY);
+            java.awt.Rectangle selectionArea = new java.awt.Rectangle(minX, minY, maxX - minX, maxY - minY);
 
-            // Add all objects within the selection bounds
-            for (GraphicObjectViewModel object : graphicObjects) {
-                if (object.getX() >= minX && object.getX() + object.getWidth() <= maxX &&
-                        object.getY() >= minY && object.getY() + object.getHeight() <= maxY) {
-                    selectedObjects.add(object);
+            // Select objects that intersect with the selection area
+            for (GraphicObjectViewModel objectViewModel : graphicObjects) {
+                java.awt.Rectangle objectBounds = new java.awt.Rectangle(
+                        objectViewModel.getX(),
+                        objectViewModel.getY(),
+                        objectViewModel.getWidth(),
+                        objectViewModel.getHeight()
+                );
+
+                // Check if the selection area intersects the object bounds
+                if (selectionArea.intersects(objectBounds)) {
+                    selectedObjects.add(objectViewModel);
                 }
             }
 
-            notifyObservers();
+            notifyObservers(); // Notify observers about the selection change
         }
 
         public void moveSelectedObjects(int deltaX, int deltaY) {
