@@ -15,11 +15,11 @@
 - ellipse
 
 ## 기능
-- object 를 type 별로 생성 할 수 있다 🍀
-- object를 multi select 할 수 있다
-- object가 선택된 경우 속성창에 선택된 object 의 속성을 보여줄 수 있다
-- 선택된 object 가 없는 경우 아무 것도 보여주지 않는다 
-- object 의 위치와 크기를 조절 할 수 있다 🍀
-- 속성창에 위치와 크기 값이 즉시 반영 된다 
-- 속성창에서 특정 값을 바꾸면 object 에 즉시 반영 된다 
-- object 의 z-order 를 조절할 수 있다
+- object 를 type 별로 생성 할 수 있다 ✔️
+- object를 multi select 할 수 있다 ✔️
+- object가 선택된 경우 속성창에 선택된 object 의 속성을 보여줄 수 있다 ✔️
+- 선택된 object 가 없는 경우 아무 것도 보여주지 않는다 ✔️
+- object 의 위치와 크기를 조절 할 수 있다 ✔️
+- 속성창에 위치와 크기 값이 즉시 반영 된다 🔺(위치는 ok, 크기는 아직 개발중)
+- 속성창에서 특정 값을 바꾸면 object 에 즉시 반영 된다 ✔️
+- object 의 z-order 를 조절할 수 있다 ❌
