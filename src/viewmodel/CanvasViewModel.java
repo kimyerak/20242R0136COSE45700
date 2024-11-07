@@ -41,6 +41,16 @@
             this.upClickEvent = new UpClickEvent(this);
             this.addObserver(propertyPanelViewModel);
             this.propertyPanelViewModel = propertyPanelViewModel;
+
+        }
+        public CanvasViewModel(PropertyPanelViewModel propertyPanelViewModel, PropertyPanelView propertyPanelView) {
+            this.graphicObjects = new ArrayList<>();
+            this.downClickEvent = new DownClickEvent(this);
+            this.dragEvent = new DragEvent(this);
+            this.upClickEvent = new UpClickEvent(this);
+            this.addObserver(propertyPanelViewModel);
+            this.propertyPanelViewModel = propertyPanelViewModel;
+            this.propertyPanelView = propertyPanelView; // PropertyPanelView 초기화
         }
 
         public boolean hasSelectedObjects() {
@@ -148,7 +158,8 @@
         public void selectObjectAt(int x, int y) {
             selectedObject = findObjectAt(x, y);
             propertyPanelViewModel.setSelectedObject(selectedObject);
-
+            propertyPanelView.updateProperties();
+            propertyPanelViewModel.onCanvasChanged();
             notifyObservers();
         }
 

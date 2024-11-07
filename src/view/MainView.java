@@ -11,14 +11,14 @@ public class MainView extends JFrame {
     private PropertyPanelView propertyPanelView;
     private ShapeToolbarView shapeToolbarView;
 
-    public MainView(CanvasViewModel canvasViewModel, PropertyPanelViewModel propertyPanelViewModel) {
+    public MainView(CanvasViewModel canvasViewModel, PropertyPanelView propertyPanelView, PropertyPanelViewModel propertyPanelViewModel) {
         this.setTitle("Vector Graphic Editor");
         this.setSize(800, 600);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // 캔버스, 속성 창, 도형 선택 툴바 초기화
         canvasView = new CanvasView(canvasViewModel);
-        propertyPanelView = new PropertyPanelView(propertyPanelViewModel);
+        this.propertyPanelView = propertyPanelView;
         shapeToolbarView = new ShapeToolbarView(propertyPanelViewModel, canvasViewModel);
 
         // 캔버스, 속성 패널, 도형 선택 툴바를 레이아웃에 배치

@@ -19,10 +19,14 @@ public class CanvasView extends JPanel {
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+
                 canvasViewModel.handleMousePressed(e.getX(), e.getY(), e.getButton());
+                // 선택된 객체 전달!!!!!!!!!!!!!!!
+                canvasViewModel.selectObjectAt(e.getX(), e.getY());
                 SwingUtilities.getWindowAncestor(CanvasView.this).repaint();
 
                 dragStartPoint = e.getPoint();
+
 
                 if (canvasViewModel.hasSelectedObjects()) {
                     canvasViewModel.setDragStart(dragStartPoint.x, dragStartPoint.y);
