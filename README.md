@@ -7,7 +7,8 @@
 | **Observer Pattern**  | `CanvasViewModel`의 상태가 바뀔 때, `PropertyPanelView`와 같은 다른 뷰에 상태 변화가 자동으로 반영되는 구조.                               |
 | **Composite Pattern** | 여러 개의 도형 객체 (`Rectangle`, `Ellipse`, 등)을 `CanvasViewModel` 안에서 동일한 방식으로 관리하고 트리 구조를 이루는 부분.              |
 
-### MVVM 파일구조💗
+### MVVM 폴더구조💗
+이 프로젝트는 **MVVM** (Model-View-ViewModel) 패턴을 사용하여 구조화되었으며, `model`, `view`, `viewmodel`의 세 가지 주요 폴더로 나뉩니다.
 ```
 src
 ├── model
