@@ -96,7 +96,7 @@
                     this.addGraphicObject(new GraphicObjectViewModel(new Ellipse(200, 100, 150, 80)));
                     break;
                 case "TextObject":
-                    this.addGraphicObject(new GraphicObjectViewModel(new TextObject(300, 200, "Sample Text")));
+                    this.addGraphicObject(new GraphicObjectViewModel(new TextObject(300, 200, "Text")));
                     break;
                 case "Line":
                     this.addGraphicObject(new GraphicObjectViewModel(new Line(100, 100, 200, 200))); // 기본 시작, 끝 좌표
@@ -119,6 +119,14 @@
                     g2d.setColor(Color.BLUE);
                     g2d.setStroke(new BasicStroke(2)); // Thicker border for selection
                     g2d.drawRect(object.getX(), object.getY(), object.getWidth(), object.getHeight());
+                }
+            }
+        }
+
+        public void render(Graphics g, TextObject excludeObject) {
+            for (GraphicObjectViewModel object : graphicObjects) {
+                if (object.getGraphicObject() != excludeObject) {
+                    object.draw(g);
                 }
             }
         }
@@ -196,21 +204,29 @@
         public void selectObjectsInArea(int startX, int startY, int endX, int endY) {
             selectedObjects.clear(); // Clear previous selections
 
-            // Calculate selection bounds
+            // Calculate the selection bounds
             int minX = Math.min(startX, endX);
             int minY = Math.min(startY, endY);
             int maxX = Math.max(startX, endX);
             int maxY = Math.max(startY, endY);
+            java.awt.Rectangle selectionArea = new java.awt.Rectangle(minX, minY, maxX - minX, maxY - minY);
 
-            // Add all objects within the selection bounds
-            for (GraphicObjectViewModel object : graphicObjects) {
-                if (object.getX() >= minX && object.getX() + object.getWidth() <= maxX &&
-                        object.getY() >= minY && object.getY() + object.getHeight() <= maxY) {
-                    selectedObjects.add(object);
+            // Select objects that intersect with the selection area
+            for (GraphicObjectViewModel objectViewModel : graphicObjects) {
+                java.awt.Rectangle objectBounds = new java.awt.Rectangle(
+                        objectViewModel.getX(),
+                        objectViewModel.getY(),
+                        objectViewModel.getWidth(),
+                        objectViewModel.getHeight()
+                );
+
+                // Check if the selection area intersects the object bounds
+                if (selectionArea.intersects(objectBounds)) {
+                    selectedObjects.add(objectViewModel);
                 }
             }
 
-            notifyObservers();
+            notifyObservers(); // Notify observers about the selection change
         }
 
         public void moveSelectedObjects(int deltaX, int deltaY) {
@@ -223,6 +239,29 @@
         public void deselectAllObjects() {
             selectedObjects.clear();
             notifyObservers();
+        }
+
+        public TextObject findTextObjectAt(int x, int y) {
+            for (GraphicObjectViewModel objectViewModel : graphicObjects) {
+                // Access the wrapped graphic object inside GraphicObjectViewModel
+                GraphicObject graphicObject = objectViewModel.getGraphicObject();
+
+                // Check if the graphic object is a TextObject
+                if (graphicObject instanceof TextObject) {
+                    TextObject textObject = (TextObject) graphicObject;
+
+                    // Check if (x, y) falls within the bounds of the textObject
+                    if (x >= textObject.getX() && x <= textObject.getX() + textObject.getWidth() &&
+                            y >= textObject.getY() && y <= textObject.getY() + textObject.getHeight()) {
+                        return textObject;
+                    }
+                }
+            }
+            return null; // Return null if no TextObject is found at (x, y)
+        }
+
+        public void updateTextObject(TextObject textObject) {
+            notifyObservers(); // Refresh the canvas after text change
         }
 
         // 좌표에 있는 도형을 찾아 반환하는 메서드
