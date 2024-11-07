@@ -1,11 +1,12 @@
 # 디자인 패턴을 적용한 벡터 그래픽 에디터 (개발중)
-### Observer + Composite Pattern 적용 🍀
-이 프로젝트는 Observer Pattern과 Composite Pattern이 모두 적용된 구조로, 두 패턴을 함께 사용하는 복합적인 디자인이 현재 프로젝트에 적용된 상태입니다.
+### Observer + Composite + State + Command Pattern 적용 🍀
 
 | 디자인 패턴      | 설명                                                                                                                                               |
 |------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Observer Pattern**  | `CanvasViewModel`의 상태가 바뀔 때, `PropertyPanelView`와 같은 다른 뷰에 상태 변화가 자동으로 반영되는 구조                               |
 | **Composite Pattern** | 여러 개의 도형 객체 (`Rectangle`, `Ellipse`, 등)을 `CanvasViewModel` 안에서 동일한 방식으로 관리하고 트리 구조를 이루는 부분              |
+| **State Pattern** | 여러 개의 마우스 이벤트 (`downClick`, `upClick`, `drag`등)             |
+| **Command Pattern** | Undo, Redo가 편하게 Stack에 X,Y,Width,Height를 `push`, `pop`              |
 
 ### MVVM 폴더구조💗
 이 프로젝트는 **MVVM** (Model-View-ViewModel) 패턴을 사용하여 구조화되었으며, `model`, `view`, `viewmodel`의 세 가지 주요 폴더로 나뉩니다.
