@@ -12,10 +12,6 @@ public class PropertyPanelViewModel implements CanvasObserver{
         this.propertyPanelView = null; // PropertyPanelView를 나중에 설정할 수 있도록 초기화
     }
 
-    // 기존 PropertyPanelView를 받는 생성자
-    public PropertyPanelViewModel(PropertyPanelView propertyPanelView) {
-        this.propertyPanelView = propertyPanelView;
-    }
 
     // 선택된 객체 설정
     public void setSelectedObject(GraphicObjectViewModel object) {
@@ -35,6 +31,8 @@ public class PropertyPanelViewModel implements CanvasObserver{
         if (selectedObject != null) {
             selectedObject.move(x, y);
             selectedObject.resize(width, height);
+    // CanvasViewModel에 변경 사항 알림
+            selectedObject.getCanvasViewModel().notifyObservers();
         }
     }
 
@@ -76,6 +74,7 @@ public class PropertyPanelViewModel implements CanvasObserver{
     public String getSelectedShapeType() {
         return selectedShapeType;
     }
+
     // 텍스트 업데이트
     public void updateText(String newText) {
         if (selectedObject != null && selectedObject.getGraphicObject() instanceof TextObject) {
@@ -95,6 +94,7 @@ public class PropertyPanelViewModel implements CanvasObserver{
         }
         return "";
     }
+
     @Override
     public void onCanvasChanged() {
         System.out.println("onCanvasChanged called in PropertyPanelViewModel");
@@ -105,7 +105,6 @@ public class PropertyPanelViewModel implements CanvasObserver{
             // 선택된 객체가 없을 경우, 기본 메시지 설정
             selectedShapeType = "No object selected";
         }
-        // 여기서 GUI를 갱신하도록 이벤트 발생 (필요 시 PropertyPanelView에 직접 알림)
         // 콘솔 로그에 출력
         System.out.println(selectedShapeType);
 

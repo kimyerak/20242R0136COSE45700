@@ -100,7 +100,7 @@ public class CanvasViewModel {
             try {
                 Image image = ImageIO.read(file);
                 ImageObject imageObject = new ImageObject(50, 50, 100, 100, file.getAbsolutePath()); // Default size and position
-                addGraphicObject(new GraphicObjectViewModel(imageObject));
+                addGraphicObject(new GraphicObjectViewModel(imageObject, this));
                 notifyObservers(); // Notify to refresh the canvas
             } catch (IOException e) {
                 e.printStackTrace();
@@ -116,16 +116,16 @@ public class CanvasViewModel {
     public void addGraphicObjectByShapeType(String shapeType) {
         switch (shapeType) {
             case "Rectangle":
-                this.addGraphicObject(new GraphicObjectViewModel(new Rectangle(50, 50, 100, 100)));
+                this.addGraphicObject(new GraphicObjectViewModel(new model.Rectangle(50, 50, 100, 100), this));
                 break;
             case "Ellipse":
-                this.addGraphicObject(new GraphicObjectViewModel(new Ellipse(200, 100, 150, 80)));
+                this.addGraphicObject(new GraphicObjectViewModel(new model.Ellipse(200, 100, 150, 80),this));
                 break;
             case "TextObject":
-                this.addGraphicObject(new GraphicObjectViewModel(new TextObject(300, 200, "Text")));
+                this.addGraphicObject(new GraphicObjectViewModel(new model.TextObject(300, 200, "Text"),this));
                 break;
             case "Line":
-                this.addGraphicObject(new GraphicObjectViewModel(new Line(100, 100, 200, 200))); // 기본 시작, 끝 좌표
+                this.addGraphicObject(new GraphicObjectViewModel(new model.Line(100, 100, 200, 200),this)); // 기본 시작, 끝 좌표
                 break;
             // 필요한 경우 다른 도형도 추가
         }
