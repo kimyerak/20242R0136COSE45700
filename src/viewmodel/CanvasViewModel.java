@@ -222,13 +222,6 @@ public class CanvasViewModel {
         notifyObservers(); // Notify observers about the selection change
     }
 
-    public void moveSelectedObjects(int deltaX, int deltaY) {
-        for (GraphicObjectViewModel object : selectedObjects) {
-            object.move(object.getX() + deltaX, object.getY() + deltaY);
-        }
-        notifyObservers();
-    }
-
     public void deselectAllObjects() {
         selectedObjects.clear();
         notifyObservers();
