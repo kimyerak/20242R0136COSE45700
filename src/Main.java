@@ -20,10 +20,10 @@ public class Main {
         canvasViewModel.addObserver(propertyPanelView);
 
         // 초기 그래픽 객체 추가 (예시로 간단히 몇 개 추가)
-        canvasViewModel.addGraphicObject(new GraphicObjectViewModel(new model.Rectangle(50, 50, 100, 100)));
-        canvasViewModel.addGraphicObject(new GraphicObjectViewModel(new model.Ellipse(200, 100, 150, 80)));
-        canvasViewModel.addGraphicObject(new GraphicObjectViewModel(new model.TextObject(300, 200, "미리디 화이팅")));
-        canvasViewModel.addGraphicObject(new GraphicObjectViewModel(new model.Line(100, 300, 200, 400)));
+        canvasViewModel.addGraphicObject(new GraphicObjectViewModel(new model.Rectangle(50, 50, 100, 100), canvasViewModel));
+        canvasViewModel.addGraphicObject(new GraphicObjectViewModel(new model.Ellipse(200, 100, 150, 80), canvasViewModel));
+        canvasViewModel.addGraphicObject(new GraphicObjectViewModel(new model.TextObject(300, 200, "미리디 화이팅"), canvasViewModel));
+        canvasViewModel.addGraphicObject(new GraphicObjectViewModel(new model.Line(100, 300, 200, 400), canvasViewModel));
 
         // MainView 인스턴스를 생성하고 ViewModel을 주입
         MainView mainView = new MainView(canvasViewModel, propertyPanelView ,propertyPanelViewModel);

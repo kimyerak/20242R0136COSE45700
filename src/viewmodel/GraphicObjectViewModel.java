@@ -4,11 +4,16 @@ import java.awt.Graphics;
 
 public class GraphicObjectViewModel {
     private GraphicObject graphicObject;
+    private CanvasViewModel canvasViewModel;
 
-    public GraphicObjectViewModel(GraphicObject graphicObject) {
+    public GraphicObjectViewModel(GraphicObject graphicObject, CanvasViewModel canvasViewModel) {
+
         this.graphicObject = graphicObject;
+        this.canvasViewModel = canvasViewModel;
     }
-
+    public CanvasViewModel getCanvasViewModel() {
+        return canvasViewModel;
+    }
     // 그래픽 객체 그리기
     public void draw(Graphics g) {
         graphicObject.draw(g);

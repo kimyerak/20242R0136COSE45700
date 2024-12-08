@@ -1,264 +1,200 @@
-package viewmodel;
+package view;
 
-import model.command.Command;
-import model.command.CommandManager;
-import viewmodel.State.MouseState;
-import viewmodel.State.SelectState;
-
+import model.TextObject;
+import viewmodel.CanvasViewModel;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-import model.*;
-import model.Rectangle;
-import view.PropertyPanelView;
+public class CanvasView extends JPanel {
+    private CanvasViewModel canvasViewModel;
 
-import java.util.ArrayList;
-import java.util.List;
+    private JTextField textEditor;
+    private TextObject editingTextObject;
+    private boolean isEditing = false;
 
-public class CanvasViewModel {
-    private List<GraphicObjectViewModel> graphicObjects;
-    private GraphicObjectViewModel selectedObject = null; // 선택된 도형
-    private List<CanvasObserver> observers = new ArrayList<>(); // 옵저버 목록
-    private List<GraphicObjectViewModel> selectedObjects = new ArrayList<>();
+    private Point dragStartPoint;
+    private Rectangle selectionRectangle;
 
-    public List<GraphicObjectViewModel> getSelectedObjects() {
-        return selectedObjects;
-    }
+    public CanvasView(CanvasViewModel canvasViewModel) {
+        this.canvasViewModel = canvasViewModel;
 
-    private PropertyPanelView propertyPanelView;
-    private PropertyPanelViewModel propertyPanelViewModel;
+        this.setLayout(null);
 
-    private MouseState currentState;
-
-    public int prevX;
-    public int prevY; // 마우스 이전 좌표
-
-    public int getPrevX() {
-        return prevX;
-    }
-
-    public int getPrevY() {
-        return prevY;
-    }
-
-    private CommandManager commandManager = new CommandManager();
-
-    public void executeCommand(Command command) {
-        commandManager.executeCommand(command);
-    }
-
-    public void undo() {
-        commandManager.undo();
-    }
-
-    public void redo() {
-        commandManager.redo();
-    }
-
-    // 기본 생성자: 빈 리스트로 초기화
-    public CanvasViewModel() {
-        this.graphicObjects = new ArrayList<>();
-        this.currentState = new SelectState(); // 초기 상태
-    }
-
-    public CanvasViewModel(PropertyPanelViewModel propertyPanelViewModel) {
-        this.graphicObjects = new ArrayList<>();
-        this.currentState = new SelectState();
-        this.addObserver(propertyPanelViewModel);
-        this.propertyPanelViewModel = propertyPanelViewModel;
-    }
-
-    public CanvasViewModel(PropertyPanelViewModel propertyPanelViewModel, PropertyPanelView propertyPanelView) {
-        this.graphicObjects = new ArrayList<>();
-        this.currentState = new SelectState();
-        this.addObserver(propertyPanelViewModel);
-        this.propertyPanelViewModel = propertyPanelViewModel;
-        this.propertyPanelView = propertyPanelView; // PropertyPanelView 초기화
-    }
-
-    public boolean hasSelectedObjects() {
-        return !selectedObjects.isEmpty();
-    }
-
-    public boolean isObjectSelected(GraphicObjectViewModel object) {
-        return selectedObjects.contains(object);
-    }
-
-    public void setDragStart(int x, int y) {
-        prevX = x;
-        prevY = y;
-    }
-
-    public void loadImage() {
-        JFileChooser fileChooser = new JFileChooser();
-        int result = fileChooser.showOpenDialog(null);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File file = fileChooser.getSelectedFile();
-            try {
-                Image image = ImageIO.read(file);
-                ImageObject imageObject = new ImageObject(50, 50, 100, 100, file.getAbsolutePath()); // Default size and position
-                addGraphicObject(new GraphicObjectViewModel(imageObject));
-                notifyObservers(); // Notify to refresh the canvas
-            } catch (IOException e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Failed to load image.");
+        textEditor = new JTextField();
+        textEditor.setVisible(false);
+        textEditor.setBorder(BorderFactory.createLineBorder(Color.BLUE, 3));
+        textEditor.setBackground(getBackground());
+        textEditor.setForeground(Color.BLACK);
+        textEditor.addActionListener(e -> finalizeTextEdit());
+        textEditor.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                finalizeTextEdit();
             }
-        }
-    }
+        });
 
-    public void addGraphicObject(GraphicObjectViewModel object) {
-        graphicObjects.add(object);
-    }
-
-    public void addGraphicObjectByShapeType(String shapeType) {
-        switch (shapeType) {
-            case "Rectangle":
-                this.addGraphicObject(new GraphicObjectViewModel(new Rectangle(50, 50, 100, 100)));
-                break;
-            case "Ellipse":
-                this.addGraphicObject(new GraphicObjectViewModel(new Ellipse(200, 100, 150, 80)));
-                break;
-            case "TextObject":
-                this.addGraphicObject(new GraphicObjectViewModel(new TextObject(300, 200, "Text")));
-                break;
-            case "Line":
-                this.addGraphicObject(new GraphicObjectViewModel(new Line(100, 100, 200, 200))); // 기본 시작, 끝 좌표
-                break;
-            // 필요한 경우 다른 도형도 추가
-        }
-    }
-
-    public void render(Graphics g) {
-        for (GraphicObjectViewModel object : graphicObjects) {
-            object.draw(g); // 각 객체 그리기
-        }
-
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.BLUE);
-        g2d.setStroke(new BasicStroke(2));
-        for (GraphicObjectViewModel object : selectedObjects) {
-            g2d.drawRect(object.getX(), object.getY(), object.getWidth(), object.getHeight());
-        }
-    }
-
-    public void render(Graphics g, TextObject excludeObject) {
-        for (GraphicObjectViewModel object : graphicObjects) {
-            if (object.getGraphicObject() != excludeObject) {
-                object.draw(g);
+        textEditor.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateTextEditorSize();
             }
-        }
-    }
 
-    public void handleMousePressed(int x, int y, int button) {
-        if (currentState != null) {
-            currentState.handleMouseDown(this, x, y);
-        }
-    }
-
-    public void handleMouseDrag(int x, int y) {
-        if (currentState != null) {
-            currentState.handleMouseDrag(this, x, y);
-        }
-    }
-
-    public void handleMouseReleased(int x, int y) {
-        if (currentState != null) {
-            currentState.handleMouseUp(this, x, y);
-        }
-    }
-
-    public void addObserver(CanvasObserver observer) {
-        observers.add(observer);
-    }
-
-    public void notifyObservers() {
-        for (CanvasObserver observer : observers) {
-            observer.onCanvasChanged();
-        }
-    }
-
-    public void selectObjectAt(int x, int y) {
-        selectedObject = findObjectAt(x, y);
-        propertyPanelViewModel.setSelectedObject(selectedObject);
-        propertyPanelView.updateProperties();
-        propertyPanelViewModel.onCanvasChanged();
-        notifyObservers();
-    }
-
-    public void selectSingleObject(GraphicObjectViewModel object) {
-        deselectAllObjects();
-        selectedObjects.add(object);
-        notifyObservers();
-    }
-
-    public void selectObjectsInArea(int startX, int startY, int endX, int endY) {
-        selectedObjects.clear(); // Clear previous selections
-
-        // Calculate the selection bounds
-        int minX = Math.min(startX, endX);
-        int minY = Math.min(startY, endY);
-        int maxX = Math.max(startX, endX);
-        int maxY = Math.max(startY, endY);
-        java.awt.Rectangle selectionArea = new java.awt.Rectangle(minX, minY, maxX - minX, maxY - minY);
-
-        // Select objects that intersect with the selection area
-        for (GraphicObjectViewModel objectViewModel : graphicObjects) {
-            java.awt.Rectangle objectBounds = new java.awt.Rectangle(
-                    objectViewModel.getX(),
-                    objectViewModel.getY(),
-                    objectViewModel.getWidth(),
-                    objectViewModel.getHeight()
-            );
-
-            // Check if the selection area intersects the object bounds
-            if (selectionArea.intersects(objectBounds)) {
-                selectedObjects.add(objectViewModel);
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateTextEditorSize();
             }
-        }
 
-        notifyObservers(); // Notify observers about the selection change
-    }
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateTextEditorSize();
+            }
+        });
 
-    public void moveSelectedObjects(int deltaX, int deltaY) {
-        for (GraphicObjectViewModel object : selectedObjects) {
-            object.move(object.getX() + deltaX, object.getY() + deltaY);
-        }
-        notifyObservers();
-    }
+        add(textEditor);
 
-    public void deselectAllObjects() {
-        selectedObjects.clear();
-        notifyObservers();
-    }
+        // 마우스 이벤트 처리 등록
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
 
-    public TextObject findTextObjectAt(int x, int y) {
-        for (GraphicObjectViewModel objectViewModel : graphicObjects) {
-            GraphicObject graphicObject = objectViewModel.getGraphicObject();
-            if (graphicObject instanceof TextObject) {
-                TextObject textObject = (TextObject) graphicObject;
-                if (x >= textObject.getX() && x <= textObject.getX() + textObject.getWidth() &&
-                        y >= textObject.getY() && y <= textObject.getY() + textObject.getHeight()) {
-                    return textObject;
+                canvasViewModel.handleMousePressed(e.getX(), e.getY(), e.getButton());
+                // 선택된 객체 전달!!!!!!!!!!!!!!!
+                canvasViewModel.selectObjectAt(e.getX(), e.getY());
+                SwingUtilities.getWindowAncestor(CanvasView.this).repaint();
+
+                dragStartPoint = e.getPoint();
+
+                if (canvasViewModel.hasSelectedObjects()) {
+                    canvasViewModel.setDragStart(dragStartPoint.x, dragStartPoint.y);
+                } else {
+                    selectionRectangle = new Rectangle();
+                }
+
+                if (e.getClickCount() == 2) {
+                    TextObject clickedTextObject = canvasViewModel.findTextObjectAt(e.getX(), e.getY());
+                    if (clickedTextObject != null) {
+                        startTextEdit(clickedTextObject);
+                        canvasViewModel.deselectAllObjects();
+                    }
+                } else {
+                    finalizeTextEdit();
                 }
             }
-        }
-        return null;
-    }
 
-    public void updateTextObject() {
-        notifyObservers();
-    }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                canvasViewModel.handleMouseReleased(e.getX(), e.getY());
 
-    public GraphicObjectViewModel findObjectAt(int x, int y) {
-        for (GraphicObjectViewModel object : graphicObjects) {
-            if (x >= object.getX() && x <= object.getX() + object.getWidth() &&
-                    y >= object.getY() && y <= object.getY() + object.getHeight()) {
-                return object;
+                if (selectionRectangle != null) {
+                    canvasViewModel.selectObjectsInArea(dragStartPoint.x, dragStartPoint.y, e.getX(), e.getY());
+                    selectionRectangle = null;
+                } else {
+                    if (!canvasViewModel.hasSelectedObjects()) {
+                        canvasViewModel.deselectAllObjects();
+                    }
+                }
+                repaint();
             }
+        });
+
+        this.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (selectionRectangle != null) {
+                    int x = Math.min(dragStartPoint.x, e.getX());
+                    int y = Math.min(dragStartPoint.y, e.getY());
+                    int width = Math.abs(dragStartPoint.x - e.getX());
+                    int height = Math.abs(dragStartPoint.y - e.getY());
+
+                    selectionRectangle = new Rectangle(x, y, width, height);
+                    canvasViewModel.selectObjectsInArea(dragStartPoint.x, dragStartPoint.y, e.getX(), e.getY());
+                } else if (canvasViewModel.hasSelectedObjects()) {
+                    canvasViewModel.handleMouseDrag(e.getX(), e.getY());
+                }
+
+                repaint();  // 드래그 중에는 캔버스를 계속 다시 그리기
+            }
+        });
+    }
+
+    private void startTextEdit(TextObject textObject) {
+        editingTextObject = textObject;
+        textEditor.setText(textObject.getText());
+
+        Font font = getFont();
+        textEditor.setFont(font);
+
+        FontMetrics metrics = getGraphics().getFontMetrics(font);
+        int textWidth = metrics.stringWidth(textObject.getText());
+        int textHeight = metrics.getHeight();
+
+        textEditor.setBounds(textObject.getX() - 1, textObject.getY() - metrics.getAscent() + 13, textWidth + 6, textHeight + 2);
+        textEditor.setVisible(true);
+        textEditor.requestFocus();
+
+        isEditing = true;
+        repaint();
+    }
+
+    private void finalizeTextEdit() {
+        if (isEditing && editingTextObject != null) {
+            editingTextObject.setText(textEditor.getText());
+            canvasViewModel.updateTextObject();
+            textEditor.setVisible(false);
+            editingTextObject = null;
+            isEditing = false;
+            repaint();
         }
-        return null;
+    }
+
+    private void updateTextEditorSize() {
+        FontMetrics metrics = textEditor.getFontMetrics(textEditor.getFont());
+        int newWidth = metrics.stringWidth(textEditor.getText()) + 6;
+        int height = textEditor.getHeight();
+
+        textEditor.setSize(newWidth, height);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        // 배경을 초기화 (화면 클리어)
+        super.paintComponent(g);
+
+        Graphics2D g2d = (Graphics2D) g;
+
+        // 기존 상태 저장
+        Stroke originalStroke = g2d.getStroke();
+        Color originalColor = g2d.getColor();
+
+        // 드래그 중일 때만 selectionRectangle을 그린다
+        if (selectionRectangle != null && selectionRectangle.width > 0 && selectionRectangle.height > 0) {
+            g2d.setColor(Color.BLUE);
+            g2d.setStroke(new BasicStroke(1)); // Width 1의 선 설정
+            g2d.draw(selectionRectangle); // Selection Rectangle 그리기
+        }
+
+        // Stroke와 Color를 원래 상태로 복원
+        g2d.setStroke(originalStroke);
+        g2d.setColor(originalColor);
+
+        // 캔버스의 나머지 객체 렌더링
+        if (isEditing && editingTextObject != null) {
+            canvasViewModel.render(g, editingTextObject);
+        } else {
+            canvasViewModel.render(g);
+        }
+    }
+
+    // 캔버스를 다시 그리기 위한 메서드
+    public void updateCanvas() {
+
+        repaint();  // 캔버스를 다시 그리도록 요청
+    }
+
+    public void registerEvents() {
+        // 필요한 추가 이벤트 핸들러가 있으면 여기서 등록
     }
 }
