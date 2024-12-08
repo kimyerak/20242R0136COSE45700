@@ -8,6 +8,8 @@
     import model.*; // Import model classes
     import model.Rectangle;
     import view.PropertyPanelView;
+    import viewmodel.State.MouseState;
+    import viewmodel.State.SelectState;
 
     import java.util.ArrayList;
     import java.util.List;
@@ -17,37 +19,28 @@
         private GraphicObjectViewModel selectedObject = null;  // 선택된 도형
         private List<CanvasObserver> observers = new ArrayList<>();  // 옵저버 목록
         private List<GraphicObjectViewModel> selectedObjects = new ArrayList<>();
-
+        private MouseState currentState;
         int prevX, prevY;  // 마우스 이전 좌표
 
-        private Event downClickEvent;
-        private Event dragEvent;
-        private Event upClickEvent;
+
         private PropertyPanelView propertyPanelView;
         private PropertyPanelViewModel propertyPanelViewModel;
 
         // 기본 생성자: 빈 리스트로 초기화
         public CanvasViewModel() {
             this.graphicObjects = new ArrayList<>();
-            this.downClickEvent = new DownClickEvent(this);
-            this.dragEvent = new DragEvent(this);
-            this.upClickEvent = new UpClickEvent(this);
+            this.currentState = new SelectState(this);
+
         }
 
         public CanvasViewModel(PropertyPanelViewModel propertyPanelViewModel) {
             this.graphicObjects = new ArrayList<>();
-            this.downClickEvent = new DownClickEvent(this);
-            this.dragEvent = new DragEvent(this);
-            this.upClickEvent = new UpClickEvent(this);
             this.addObserver(propertyPanelViewModel);
             this.propertyPanelViewModel = propertyPanelViewModel;
 
         }
         public CanvasViewModel(PropertyPanelViewModel propertyPanelViewModel, PropertyPanelView propertyPanelView) {
             this.graphicObjects = new ArrayList<>();
-            this.downClickEvent = new DownClickEvent(this);
-            this.dragEvent = new DragEvent(this);
-            this.upClickEvent = new UpClickEvent(this);
             this.addObserver(propertyPanelViewModel);
             this.propertyPanelViewModel = propertyPanelViewModel;
             this.propertyPanelView = propertyPanelView; // PropertyPanelView 초기화
@@ -65,6 +58,13 @@
             prevX = x;
             prevY = y;
         }
+        public void setState(MouseState state) {
+            this.currentState = state;
+        }
+
+        public void setMouseState(MouseState newState) {
+            this.currentState = newState;
+        }
 
         public void loadImage() {
             JFileChooser fileChooser = new JFileChooser();
@@ -74,7 +74,7 @@
                 try {
                     Image image = ImageIO.read(file);
                     ImageObject imageObject = new ImageObject(50, 50, 100, 100, file.getAbsolutePath()); // Default size and position
-                    addGraphicObject(new GraphicObjectViewModel(imageObject));
+                    addGraphicObject(new GraphicObjectViewModel(imageObject, this));
                     notifyObservers(); // Notify to refresh the canvas
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -90,16 +90,16 @@
         public void addGraphicObjectByShapeType(String shapeType) {
             switch (shapeType) {
                 case "Rectangle":
-                    this.addGraphicObject(new GraphicObjectViewModel(new Rectangle(50, 50, 100, 100)));
+                    this.addGraphicObject(new GraphicObjectViewModel(new Rectangle(50, 50, 100, 100), this));
                     break;
                 case "Ellipse":
-                    this.addGraphicObject(new GraphicObjectViewModel(new Ellipse(200, 100, 150, 80)));
+                    this.addGraphicObject(new GraphicObjectViewModel(new Ellipse(200, 100, 150, 80),this));
                     break;
                 case "TextObject":
-                    this.addGraphicObject(new GraphicObjectViewModel(new TextObject(300, 200, "Text")));
+                    this.addGraphicObject(new GraphicObjectViewModel(new TextObject(300, 200, "Text"),this));
                     break;
                 case "Line":
-                    this.addGraphicObject(new GraphicObjectViewModel(new Line(100, 100, 200, 200))); // 기본 시작, 끝 좌표
+                    this.addGraphicObject(new GraphicObjectViewModel(new Line(100, 100, 200, 200),this)); // 기본 시작, 끝 좌표
                     break;
                 // 필요한 경우 다른 도형도 추가
             }
@@ -131,23 +131,24 @@
             }
         }
 
-        // 마우스 이벤트 처리 메서드들
+        // 마우스 이벤트 처리 메서드들 3개
         public void handleMousePressed(int x, int y, int button) {
-            downClickEvent.handle(x, y);  // DownClickEvent 호출
-            if (hasSelectedObjects()) {
-                prevX = x;
-                prevY = y;
+            if (currentState != null) {
+                currentState.handleMouseDown(x, y);
             }
+            //우클릭시 앞으로 가져오기 메뉴 띄우기 이런것도 가능할듯
         }
 
         public void handleMouseDragged(int x, int y) {
-            dragEvent.handle(x, y);  // DragEvent 호출
-            prevX = x;
-            prevY = y;
+            if (currentState != null) {
+                currentState.handleMouseDrag(x, y);
+            }
         }
 
         public void handleMouseReleased(int x, int y) {
-            upClickEvent.handle(x, y);  // UpClickEvent 호출
+            if (currentState != null) {
+                currentState.handleMouseUp(x, y);
+            }
         }
 
         // 옵저버 등록 메서드
@@ -156,7 +157,7 @@
         }
 
         // 옵저버에게 변경 사항 알림
-        private void notifyObservers() {
+        public void notifyObservers() {
             for (CanvasObserver observer : observers) {
                 observer.onCanvasChanged();
             }
@@ -175,30 +176,6 @@
             deselectAllObjects();
             selectedObjects.add(object);
             notifyObservers();
-        }
-
-        // 선택된 객체 반환 (PropertyPanelViewModel에서 사용)
-        public GraphicObjectViewModel getSelectedObject() {
-            return selectedObject;
-        }
-
-        // 선택된 도형 이동
-        public void moveSelectedObject(int x, int y) {
-            if (selectedObject != null) {
-                int deltaX = x - prevX;
-                int deltaY = y - prevY;
-                selectedObject.move(selectedObject.getX() + deltaX, selectedObject.getY() + deltaY);
-                prevX = x;
-                prevY = y;
-
-                // 옵저버들에게 이동 후 상태를 알림
-                notifyObservers();
-            }
-        }
-
-        // 도형 선택 해제
-        public void deselectObject() {
-            selectedObject = null;
         }
 
         public void selectObjectsInArea(int startX, int startY, int endX, int endY) {
@@ -273,6 +250,13 @@
                 }
             }
             return null;
+        }
+        public void updateSelectedObject(int x, int y, int width, int height) {
+            if (selectedObject != null) {
+                selectedObject.move(x, y);
+                selectedObject.resize(width, height);
+                notifyObservers(); // 변경 사항 알림
+            }
         }
 
 
