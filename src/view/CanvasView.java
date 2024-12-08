@@ -22,6 +22,8 @@ public class CanvasView extends JPanel {
     public CanvasView(CanvasViewModel canvasViewModel) {
         this.canvasViewModel = canvasViewModel;
 
+        this.setLayout(null);
+
         textEditor = new JTextField();
         textEditor.setVisible(false);
         textEditor.setBorder(BorderFactory.createLineBorder(Color.BLUE, 3));
@@ -64,7 +66,6 @@ public class CanvasView extends JPanel {
                 SwingUtilities.getWindowAncestor(CanvasView.this).repaint();
 
                 dragStartPoint = e.getPoint();
-
 
                 if (canvasViewModel.hasSelectedObjects()) {
                     canvasViewModel.setDragStart(dragStartPoint.x, dragStartPoint.y);
@@ -111,11 +112,7 @@ public class CanvasView extends JPanel {
                     selectionRectangle = new Rectangle(x, y, width, height);
                     canvasViewModel.selectObjectsInArea(dragStartPoint.x, dragStartPoint.y, e.getX(), e.getY());
                 } else if (canvasViewModel.hasSelectedObjects()) {
-                    int deltaX = e.getX() - dragStartPoint.x;
-                    int deltaY = e.getY() - dragStartPoint.y;
-                    canvasViewModel.moveSelectedObjects(deltaX, deltaY);
-
-                    dragStartPoint = e.getPoint();
+                    canvasViewModel.handleMouseDrag(e.getX(), e.getY());
                 }
 
                 repaint();  // 드래그 중에는 캔버스를 계속 다시 그리기
@@ -145,7 +142,7 @@ public class CanvasView extends JPanel {
     private void finalizeTextEdit() {
         if (isEditing && editingTextObject != null) {
             editingTextObject.setText(textEditor.getText());
-            canvasViewModel.updateTextObject(editingTextObject);
+            canvasViewModel.updateTextObject();
             textEditor.setVisible(false);
             editingTextObject = null;
             isEditing = false;
@@ -163,15 +160,27 @@ public class CanvasView extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
+        // 배경을 초기화 (화면 클리어)
         super.paintComponent(g);
 
-        if (selectionRectangle != null) {
-            Graphics2D g2d = (Graphics2D) g;
+        Graphics2D g2d = (Graphics2D) g;
+
+        // 기존 상태 저장
+        Stroke originalStroke = g2d.getStroke();
+        Color originalColor = g2d.getColor();
+
+        // 드래그 중일 때만 selectionRectangle을 그린다
+        if (selectionRectangle != null && selectionRectangle.width > 0 && selectionRectangle.height > 0) {
             g2d.setColor(Color.BLUE);
-            g2d.setStroke(new BasicStroke(1));
-            g2d.draw(selectionRectangle);
+            g2d.setStroke(new BasicStroke(1)); // Width 1의 선 설정
+            g2d.draw(selectionRectangle); // Selection Rectangle 그리기
         }
 
+        // Stroke와 Color를 원래 상태로 복원
+        g2d.setStroke(originalStroke);
+        g2d.setColor(originalColor);
+
+        // 캔버스의 나머지 객체 렌더링
         if (isEditing && editingTextObject != null) {
             canvasViewModel.render(g, editingTextObject);
         } else {
