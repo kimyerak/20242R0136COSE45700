@@ -1,27 +1,46 @@
 package viewmodel.State;
 
+import model.command.MoveCommand;
+import model.command.SelectCommand;
 import viewmodel.CanvasViewModel;
+import viewmodel.GraphicObjectViewModel;
+
+import java.util.List;
 
 public class SelectState implements MouseState {
-    private CanvasViewModel canvasViewModel;
+    @Override
+    public void handleMouseDown(CanvasViewModel canvas, int x, int y) {
+        GraphicObjectViewModel clickedObject = canvas.findObjectAt(x, y);
 
-    public SelectState(CanvasViewModel canvasViewModel) {
-        this.canvasViewModel = canvasViewModel;
+        if (clickedObject != null) {
+            if (!canvas.isObjectSelected(clickedObject)) {
+                SelectCommand selectCommand = new SelectCommand(canvas, clickedObject);
+                canvas.executeCommand(selectCommand);
+            }
+        } else {
+            SelectCommand selectCommand = new SelectCommand(canvas, null);
+            canvas.executeCommand(selectCommand);
+        }
+
+        canvas.setDragStart(x, y);
     }
 
     @Override
-    public void handleMouseDown(int x, int y) {
-        canvasViewModel.selectObjectAt(x, y); // 선택 로직
+    public void handleMouseDrag(CanvasViewModel canvas, int x, int y) {
+        int deltaX = x - canvas.getPrevX();
+        int deltaY = y - canvas.getPrevY();
+
+        if (canvas.hasSelectedObjects()) {
+            List<GraphicObjectViewModel> selectedObjects = canvas.getSelectedObjects();
+            MoveCommand moveCommand = new MoveCommand(canvas, selectedObjects, deltaX, deltaY);
+            moveCommand.execute();
+        }
+
+        canvas.setDragStart(x, y);
     }
 
     @Override
-    public void handleMouseDrag(int x, int y) {
-        canvasViewModel.moveSelectedObjects(x - canvasViewModel.prevX, y - canvasViewModel.prevY);
-        canvasViewModel.setDragStart(x, y);
-    }
-
-    @Override
-    public void handleMouseUp(int x, int y) {
-        // 선택 종료 시 추가 작업 가능
+    public void handleMouseUp(CanvasViewModel canvas, int x, int y) {
+        // Optional: Additional behavior on mouse release
     }
 }

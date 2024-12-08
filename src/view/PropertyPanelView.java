@@ -16,7 +16,6 @@ public class PropertyPanelView extends JPanel implements CanvasObserver {
     private JTextField heightField;
     private JButton confirmButton;
     private JButton cancelButton;
-    private JButton selectButton;
 
     public PropertyPanelView(PropertyPanelViewModel propertyPanelViewModel) {
         this.propertyPanelViewModel = propertyPanelViewModel;
@@ -46,20 +45,15 @@ public class PropertyPanelView extends JPanel implements CanvasObserver {
 
         confirmButton = new JButton("확인");
         cancelButton = new JButton("취소");
-        selectButton = new JButton("선택");
 
         JPanel buttonPanel_1 = new JPanel();
         buttonPanel_1.add(confirmButton);
         buttonPanel_1.add(cancelButton);
 
-        JPanel buttonPanel_2 = new JPanel();
-        buttonPanel_2.add(selectButton);
-
         // 필드 및 버튼 추가
         this.add(positionPanel);
         this.add(sizePanel);
         this.add(buttonPanel_1);
-        this.add(buttonPanel_2);
 
         registerButtonEvents();
         updateProperties();  // 초기 상태 설정
@@ -95,8 +89,6 @@ public class PropertyPanelView extends JPanel implements CanvasObserver {
 
     }
 
-
-
     private void registerButtonEvents() {
         confirmButton.addActionListener(new ActionListener() {
             @Override
@@ -120,13 +112,6 @@ public class PropertyPanelView extends JPanel implements CanvasObserver {
             public void actionPerformed(ActionEvent e) {
                 updateProperties(); // 새로운 메서드 호출
                 JOptionPane.showMessageDialog(null, "Canceled.");
-            }
-        });
-
-        selectButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateProperties(); // 새로운 메서드 호출
             }
         });
     }
