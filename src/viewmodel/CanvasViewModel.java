@@ -12,7 +12,6 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import model.*;
-import model.Rectangle;
 import view.PropertyPanelView;
 
 import java.util.ArrayList;
@@ -26,6 +25,10 @@ public class CanvasViewModel {
 
     public List<GraphicObjectViewModel> getSelectedObjects() {
         return selectedObjects;
+    }
+
+    public List<GraphicObjectViewModel> getGraphicObjects() {
+        return graphicObjects;
     }
 
     private PropertyPanelView propertyPanelView;
@@ -178,7 +181,12 @@ public class CanvasViewModel {
         for (CanvasObserver observer : observers) {
             observer.onCanvasChanged();
         }
+        // Trigger canvas repaint
+        if (propertyPanelView != null) {
+            SwingUtilities.getWindowAncestor(propertyPanelView).repaint();
+        }
     }
+
 
     public void selectObjectAt(int x, int y) {
         selectedObject = findObjectAt(x, y);
@@ -227,6 +235,12 @@ public class CanvasViewModel {
         notifyObservers();
     }
 
+    public void clearAllObjects() {
+        graphicObjects.clear();  // Clear all objects
+        selectedObjects.clear(); // Clear selection as well
+        notifyObservers();       // Notify observers to update the canvas
+    }
+
     public TextObject findTextObjectAt(int x, int y) {
         for (GraphicObjectViewModel objectViewModel : graphicObjects) {
             GraphicObject graphicObject = objectViewModel.getGraphicObject();
@@ -246,10 +260,11 @@ public class CanvasViewModel {
     }
 
     public GraphicObjectViewModel findObjectAt(int x, int y) {
-        for (GraphicObjectViewModel object : graphicObjects) {
+        for (int i = graphicObjects.size() - 1; i >= 0; i--) { // Reverse iteration
+            GraphicObjectViewModel object = graphicObjects.get(i);
             if (x >= object.getX() && x <= object.getX() + object.getWidth() &&
                     y >= object.getY() && y <= object.getY() + object.getHeight()) {
-                return object;
+                return object; // Return the first object found in the z-order
             }
         }
         return null;

@@ -1,9 +1,11 @@
 package viewmodel;
 import model.GraphicObject;
 import model.TextObject;
+import view.CanvasView;
 import view.PropertyPanelView;
 
 public class PropertyPanelViewModel implements CanvasObserver{
+    private CanvasViewModel canvasViewModel;
     private GraphicObjectViewModel selectedObject;
     private String selectedShapeType = "No object selected"; // 처음 기본 도형 타입
     private PropertyPanelView propertyPanelView;
@@ -12,6 +14,17 @@ public class PropertyPanelViewModel implements CanvasObserver{
         this.propertyPanelView = null; // PropertyPanelView를 나중에 설정할 수 있도록 초기화
     }
 
+    public GraphicObjectViewModel getSelectedObject() {
+        return selectedObject;
+    }
+
+    public void setCanvasViewModel(CanvasViewModel canvasViewModel) {
+        this.canvasViewModel = canvasViewModel;
+    }
+
+    public CanvasViewModel getCanvasViewModel() {
+        return selectedObject != null ? selectedObject.getCanvasViewModel() : canvasViewModel;
+    }
 
     // 선택된 객체 설정
     public void setSelectedObject(GraphicObjectViewModel object) {

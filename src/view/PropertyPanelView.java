@@ -1,4 +1,7 @@
 package view;
+import model.command.BringToFrontCommand;
+import model.command.ClearCommand;
+import model.command.SendToBackCommand;
 import viewmodel.CanvasObserver;
 import viewmodel.PropertyPanelViewModel;
 
@@ -16,6 +19,11 @@ public class PropertyPanelView extends JPanel implements CanvasObserver {
     private JTextField heightField;
     private JButton confirmButton;
     private JButton cancelButton;
+    private JButton bringToFrontButton;
+    private JButton sendToBackButton;
+    private JButton undoButton;
+    private JButton redoButton;
+    private JButton clearButton;
 
     public PropertyPanelView(PropertyPanelViewModel propertyPanelViewModel) {
         this.propertyPanelViewModel = propertyPanelViewModel;
@@ -50,10 +58,32 @@ public class PropertyPanelView extends JPanel implements CanvasObserver {
         buttonPanel_1.add(confirmButton);
         buttonPanel_1.add(cancelButton);
 
+        bringToFrontButton = new JButton("Bring To Front");
+        sendToBackButton = new JButton("Send To Back");
+
+        JPanel buttonPanel_2 = new JPanel();
+        buttonPanel_2.add(bringToFrontButton);
+        buttonPanel_2.add(sendToBackButton);
+
+        undoButton = new JButton("Undo");
+        redoButton = new JButton("Redo");
+
+        JPanel buttonPanel_3 = new JPanel();
+        buttonPanel_3.add(undoButton);
+        buttonPanel_3.add(redoButton);
+
+        clearButton = new JButton("Clear All Objects");
+
+        JPanel buttonPanel_4 = new JPanel();
+        buttonPanel_4.add(clearButton);
+
         // 필드 및 버튼 추가
         this.add(positionPanel);
         this.add(sizePanel);
         this.add(buttonPanel_1);
+        this.add(buttonPanel_2);
+        this.add(buttonPanel_3);
+        this.add(buttonPanel_4);
 
         registerButtonEvents();
         updateProperties();  // 초기 상태 설정
@@ -112,6 +142,58 @@ public class PropertyPanelView extends JPanel implements CanvasObserver {
             public void actionPerformed(ActionEvent e) {
                 updateProperties(); // 새로운 메서드 호출
                 JOptionPane.showMessageDialog(null, "Canceled.");
+            }
+        });
+
+        bringToFrontButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (propertyPanelViewModel.getSelectedObject() != null) {
+                    BringToFrontCommand command = new BringToFrontCommand(
+                            propertyPanelViewModel.getCanvasViewModel(),
+                            propertyPanelViewModel.getSelectedObject()
+                    );
+                    propertyPanelViewModel.getCanvasViewModel().executeCommand(command);
+                } else {
+                    JOptionPane.showMessageDialog(null, "No object selected.");
+                }
+            }
+        });
+
+        sendToBackButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (propertyPanelViewModel.getSelectedObject() != null) {
+                    SendToBackCommand command = new SendToBackCommand(
+                            propertyPanelViewModel.getCanvasViewModel(),
+                            propertyPanelViewModel.getSelectedObject()
+                    );
+                    propertyPanelViewModel.getCanvasViewModel().executeCommand(command);
+                } else {
+                    JOptionPane.showMessageDialog(null, "No object selected.");
+                }
+            }
+        });
+
+        undoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                propertyPanelViewModel.getCanvasViewModel().undo();
+            }
+        });
+
+        redoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                propertyPanelViewModel.getCanvasViewModel().redo();
+            }
+        });
+
+        clearButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ClearCommand clearCommand = new ClearCommand(propertyPanelViewModel.getCanvasViewModel());
+                propertyPanelViewModel.getCanvasViewModel().executeCommand(clearCommand);
             }
         });
     }

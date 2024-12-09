@@ -5,9 +5,9 @@ import model.command.SelectCommand;
 import viewmodel.CanvasViewModel;
 import viewmodel.GraphicObjectViewModel;
 
-import java.util.List;
-
 public class SelectState implements MouseState {
+    private MoveCommand currentMoveCommand;
+
     @Override
     public void handleMouseDown(CanvasViewModel canvas, int x, int y) {
         GraphicObjectViewModel clickedObject = canvas.findObjectAt(x, y);
@@ -31,9 +31,11 @@ public class SelectState implements MouseState {
         int deltaY = y - canvas.getPrevY();
 
         if (canvas.hasSelectedObjects()) {
-            List<GraphicObjectViewModel> selectedObjects = canvas.getSelectedObjects();
-            MoveCommand moveCommand = new MoveCommand(canvas, selectedObjects, deltaX, deltaY);
-            moveCommand.execute();
+            if (currentMoveCommand == null) {
+                currentMoveCommand = new MoveCommand(canvas, canvas.getSelectedObjects());
+            }
+            currentMoveCommand.updateDeltas(deltaX, deltaY);
+            currentMoveCommand.applyMovement(deltaX, deltaY);
         }
 
         canvas.setDragStart(x, y);
@@ -41,6 +43,9 @@ public class SelectState implements MouseState {
 
     @Override
     public void handleMouseUp(CanvasViewModel canvas, int x, int y) {
-        // Optional: Additional behavior on mouse release
+        if (currentMoveCommand != null) {
+            canvas.executeCommand(currentMoveCommand);
+            currentMoveCommand = null;
+        }
     }
 }

@@ -9,8 +9,13 @@ public class CommandManager {
     public void executeCommand(Command command) {
         command.execute();
         commandStack.push(command);
-        undoStack.clear(); // Clear redo stack
+        undoStack.clear();
+
+        if (command instanceof CanvasAwareCommand) {
+            ((CanvasAwareCommand) command).notifyCanvas();
+        }
     }
+
 
     public void undo() {
         if (!commandStack.isEmpty()) {
