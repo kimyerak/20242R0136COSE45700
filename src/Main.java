@@ -16,6 +16,7 @@ public class Main {
         PropertyPanelView propertyPanelView = new PropertyPanelView(propertyPanelViewModel);
         CanvasViewModel canvasViewModel = new CanvasViewModel(propertyPanelViewModel, propertyPanelView); // 새로운 생성자 사용
 
+        propertyPanelViewModel.setCanvasViewModel(canvasViewModel);
 
         canvasViewModel.addObserver(propertyPanelView);
 

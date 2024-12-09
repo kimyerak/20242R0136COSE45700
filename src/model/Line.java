@@ -1,6 +1,6 @@
 package model;
 
-import java.awt.Graphics;
+import java.awt.*;
 
 public class Line implements GraphicObject {
     private int x1, y1; // 시작점 좌표
@@ -16,6 +16,7 @@ public class Line implements GraphicObject {
     @Override
     public void draw(Graphics g) {
         System.out.println("Drawing a line from (" + x1 + ", " + y1 + ") to (" + x2 + ", " + y2 + ")");
+        g.setColor(Color.BLUE);
         g.drawLine(x1, y1, x2, y2); // 실제로 선을 그리기
     }
 
