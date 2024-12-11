@@ -15,10 +15,10 @@ public class Rectangle implements GraphicObject {
     @Override
     public void draw(Graphics g) {
         System.out.println("Drawing a filled rectangle at (" + x + ", " + y + ") with width " + width + " and height " + height);
-        g.setColor(Color.RED); // Set the fill color to red
-        g.fillRect(x, y, width, height); // Fill the rectangle
-        g.setColor(Color.BLACK); // Set the border color back to black (optional)
-        g.drawRect(x, y, width, height); // Draw the rectangle border
+        g.setColor(Color.RED);
+        g.fillRect(x, y, width, height);
+        g.setColor(Color.BLACK);
+        g.drawRect(x, y, width, height);
     }
 
     @Override
@@ -51,5 +51,12 @@ public class Rectangle implements GraphicObject {
     @Override
     public int getHeight() {
         return height;
+    }
+
+    public void setText(String newText) {
+    }
+
+    public String getText() {
+        return "";
     }
 }

@@ -1,60 +1,58 @@
 package model.command;
 
+import model.GraphicObject;
+import model.GraphicObjectComposite;
 import viewmodel.CanvasViewModel;
-import viewmodel.GraphicObjectViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MoveCommand implements Command {
     private CanvasViewModel canvasViewModel;
-    private int totalDeltaX = 0, totalDeltaY = 0;
-    private int appliedDeltaX = 0, appliedDeltaY = 0;
-    private List<GraphicObjectViewModel> movedObjects;
+    private GraphicObjectComposite movedObjects;
     private List<int[]> previousPositions;
+    private List<int[]> newPositions;
 
-    public MoveCommand(CanvasViewModel canvasViewModel, List<GraphicObjectViewModel> movedObjects) {
+    public MoveCommand(CanvasViewModel canvasViewModel, GraphicObjectComposite movedObjects) {
         this.canvasViewModel = canvasViewModel;
         this.movedObjects = movedObjects;
 
         this.previousPositions = new ArrayList<>();
-        for (GraphicObjectViewModel object : movedObjects) {
+        for (GraphicObject object : movedObjects.getChildren()) {
             this.previousPositions.add(new int[]{object.getX(), object.getY()});
         }
-    }
 
-    public void updateDeltas(int deltaX, int deltaY) {
-        totalDeltaX += deltaX;
-        totalDeltaY += deltaY;
+        this.newPositions = new ArrayList<>();
     }
 
     public void applyMovement(int deltaX, int deltaY) {
-        appliedDeltaX += deltaX;
-        appliedDeltaY += deltaY;
-        for (GraphicObjectViewModel object : movedObjects) {
-            object.move(object.getX() + deltaX, object.getY() + deltaY);
+        if (!movedObjects.getChildren().isEmpty()) {
+            for (GraphicObject object : movedObjects.getChildren()) {
+                object.move(object.getX() + deltaX, object.getY() + deltaY);
+            }
         }
     }
 
     @Override
     public void execute() {
-        int remainingDeltaX = totalDeltaX - appliedDeltaX;
-        int remainingDeltaY = totalDeltaY - appliedDeltaY;
-
-        for (GraphicObjectViewModel object : movedObjects) {
-            object.move(object.getX() + remainingDeltaX, object.getY() + remainingDeltaY);
+        if (newPositions.isEmpty()) {
+            for (GraphicObject object : movedObjects.getChildren()) {
+                newPositions.add(new int[]{object.getX(), object.getY()});
+            }
+        } else {
+            for (int i = 0; i < movedObjects.getChildren().size(); i++) {
+                GraphicObject object = movedObjects.getChildren().get(i);
+                int[] newPos = newPositions.get(i);
+                object.move(newPos[0], newPos[1]);
+            }
         }
-
-        appliedDeltaX = 0;
-        appliedDeltaY = 0;
-
         canvasViewModel.notifyObservers();
     }
 
     @Override
     public void undo() {
-        for (int i = 0; i < movedObjects.size(); i++) {
-            GraphicObjectViewModel object = movedObjects.get(i);
+        for (int i = 0; i < movedObjects.getChildren().size(); i++) {
+            GraphicObject object = movedObjects.getChildren().get(i);
             int[] prevPos = previousPositions.get(i);
             object.move(prevPos[0], prevPos[1]);
         }

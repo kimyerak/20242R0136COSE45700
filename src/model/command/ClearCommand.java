@@ -1,14 +1,14 @@
 package model.command;
 
+import model.GraphicObjectComposite;
 import viewmodel.CanvasViewModel;
-import viewmodel.GraphicObjectViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ClearCommand implements Command {
     private CanvasViewModel canvasViewModel;
-    private List<GraphicObjectViewModel> removedObjects;
+    private List<GraphicObjectComposite> removedObjects = new ArrayList<>();
 
     public ClearCommand(CanvasViewModel canvasViewModel) {
         this.canvasViewModel = canvasViewModel;
@@ -16,17 +16,17 @@ public class ClearCommand implements Command {
 
     @Override
     public void execute() {
-        removedObjects = new ArrayList<>(canvasViewModel.getGraphicObjects());
+        if (removedObjects.isEmpty()) {
+            removedObjects.addAll(canvasViewModel.getGraphicObjects());
+        }
         canvasViewModel.clearAllObjects();
         canvasViewModel.notifyObservers();
     }
 
     @Override
     public void undo() {
-        if (removedObjects != null) {
-            for (GraphicObjectViewModel object : removedObjects) {
-                canvasViewModel.addGraphicObject(object);
-            }
+        if (!removedObjects.isEmpty()) {
+            canvasViewModel.getGraphicObjects().addAll(removedObjects);
             canvasViewModel.notifyObservers();
         }
     }

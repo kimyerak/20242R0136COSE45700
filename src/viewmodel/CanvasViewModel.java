@@ -1,7 +1,10 @@
 package viewmodel;
 
+import model.*;
+import model.Rectangle;
 import model.command.Command;
 import model.command.CommandManager;
+import view.PropertyPanelView;
 import viewmodel.State.MouseState;
 import viewmodel.State.SelectState;
 
@@ -10,34 +13,51 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
-
-import model.*;
-import view.PropertyPanelView;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class CanvasViewModel {
-    private List<GraphicObjectViewModel> graphicObjects;
-    private GraphicObjectViewModel selectedObject = null; // 선택된 도형
-    private List<CanvasObserver> observers = new ArrayList<>(); // 옵저버 목록
-    private List<GraphicObjectViewModel> selectedObjects = new ArrayList<>();
+    private List<GraphicObjectComposite> graphicObjects;
+    private List<CanvasObserver> observers = new ArrayList<>();
+    private GraphicObjectComposite selectedObjects = new GraphicObjectComposite();
+    private PropertyPanelView propertyPanelView;
+    private PropertyPanelViewModel propertyPanelViewModel;
+    private MouseState currentState;
+    private CommandManager commandManager = new CommandManager();
+    private int prevX;
+    private int prevY;
+    public int boundingBoxX;
+    public int boundingBoxY;
+    public int boundingBoxWidth;
+    public int boundingBoxHeight;
 
-    public List<GraphicObjectViewModel> getSelectedObjects() {
+    public CanvasViewModel() {
+        this.graphicObjects = new ArrayList<>();
+        this.currentState = new SelectState();
+    }
+
+    public CanvasViewModel(PropertyPanelViewModel propertyPanelViewModel) {
+        this();
+        this.propertyPanelViewModel = propertyPanelViewModel;
+        this.addObserver(propertyPanelViewModel);
+    }
+
+    public CanvasViewModel(PropertyPanelViewModel propertyPanelViewModel, PropertyPanelView propertyPanelView) {
+        this(propertyPanelViewModel);
+        this.propertyPanelView = propertyPanelView;
+    }
+
+    public GraphicObjectComposite getSelectedObjects() {
         return selectedObjects;
     }
 
-    public List<GraphicObjectViewModel> getGraphicObjects() {
+    public List<GraphicObjectComposite> getGraphicObjects() {
         return graphicObjects;
     }
 
-    private PropertyPanelView propertyPanelView;
-    private PropertyPanelViewModel propertyPanelViewModel;
-
-    private MouseState currentState;
-
-    public int prevX;
-    public int prevY; // 마우스 이전 좌표
+    public PropertyPanelViewModel getPropertyPanelViewModel() {
+        return this.propertyPanelViewModel;
+    }
 
     public int getPrevX() {
         return prevX;
@@ -46,8 +66,6 @@ public class CanvasViewModel {
     public int getPrevY() {
         return prevY;
     }
-
-    private CommandManager commandManager = new CommandManager();
 
     public void executeCommand(Command command) {
         commandManager.executeCommand(command);
@@ -61,38 +79,13 @@ public class CanvasViewModel {
         commandManager.redo();
     }
 
-    // 기본 생성자: 빈 리스트로 초기화
-    public CanvasViewModel() {
-        this.graphicObjects = new ArrayList<>();
-        this.currentState = new SelectState(); // 초기 상태
-    }
-
-    public CanvasViewModel(PropertyPanelViewModel propertyPanelViewModel) {
-        this.graphicObjects = new ArrayList<>();
-        this.currentState = new SelectState();
-        this.addObserver(propertyPanelViewModel);
-        this.propertyPanelViewModel = propertyPanelViewModel;
-    }
-
-    public CanvasViewModel(PropertyPanelViewModel propertyPanelViewModel, PropertyPanelView propertyPanelView) {
-        this.graphicObjects = new ArrayList<>();
-        this.currentState = new SelectState();
-        this.addObserver(propertyPanelViewModel);
-        this.propertyPanelViewModel = propertyPanelViewModel;
-        this.propertyPanelView = propertyPanelView; // PropertyPanelView 초기화
-    }
-
     public boolean hasSelectedObjects() {
-        return !selectedObjects.isEmpty();
-    }
-
-    public boolean isObjectSelected(GraphicObjectViewModel object) {
-        return selectedObjects.contains(object);
+        return !selectedObjects.getChildren().isEmpty();
     }
 
     public void setDragStart(int x, int y) {
-        prevX = x;
-        prevY = y;
+        this.prevX = x;
+        this.prevY = y;
     }
 
     public void loadImage() {
@@ -102,57 +95,42 @@ public class CanvasViewModel {
             File file = fileChooser.getSelectedFile();
             try {
                 Image image = ImageIO.read(file);
-                ImageObject imageObject = new ImageObject(50, 50, 100, 100, file.getAbsolutePath()); // Default size and position
-                addGraphicObject(new GraphicObjectViewModel(imageObject, this));
-                notifyObservers(); // Notify to refresh the canvas
+                ImageObject imageObject = new ImageObject(50, 50, 100, 100, file.getAbsolutePath());
+                addGraphicObject(imageObject);
+                notifyObservers();
             } catch (IOException e) {
-                e.printStackTrace();
                 JOptionPane.showMessageDialog(null, "Failed to load image.");
             }
         }
     }
 
-    public void addGraphicObject(GraphicObjectViewModel object) {
-        graphicObjects.add(object);
+    public void addGraphicObject(GraphicObject object) {
+        GraphicObjectComposite composite = new GraphicObjectComposite();
+        composite.addGraphicObject(object);
+        graphicObjects.add(composite);
     }
 
     public void addGraphicObjectByShapeType(String shapeType) {
         switch (shapeType) {
             case "Rectangle":
-                this.addGraphicObject(new GraphicObjectViewModel(new model.Rectangle(50, 50, 100, 100), this));
+                addGraphicObject(new Rectangle(50, 50, 100, 100));
                 break;
             case "Ellipse":
-                this.addGraphicObject(new GraphicObjectViewModel(new model.Ellipse(200, 100, 150, 80),this));
+                addGraphicObject(new Ellipse(200, 100, 150, 80));
                 break;
             case "TextObject":
-                this.addGraphicObject(new GraphicObjectViewModel(new model.TextObject(300, 200, "Text"),this));
+                addGraphicObject(new TextObject(300, 200, "Text"));
                 break;
             case "Line":
-                this.addGraphicObject(new GraphicObjectViewModel(new model.Line(100, 100, 200, 200),this)); // 기본 시작, 끝 좌표
+                addGraphicObject(new Line(100, 100, 200, 200));
                 break;
-            // 필요한 경우 다른 도형도 추가
         }
     }
 
-    public void render(Graphics g) {
-        for (GraphicObjectViewModel object : graphicObjects) {
-            object.draw(g); // 각 객체 그리기
-        }
-
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.BLUE);
-        g2d.setStroke(new BasicStroke(2));
-        for (GraphicObjectViewModel object : selectedObjects) {
-            g2d.drawRect(object.getX(), object.getY(), object.getWidth(), object.getHeight());
-        }
-    }
-
-    public void render(Graphics g, TextObject excludeObject) {
-        for (GraphicObjectViewModel object : graphicObjects) {
-            if (object.getGraphicObject() != excludeObject) {
-                object.draw(g);
-            }
-        }
+    public void clearAllObjects() {
+        graphicObjects.clear();
+        selectedObjects.clear();
+        notifyObservers();
     }
 
     public void handleMousePressed(int x, int y, int button) {
@@ -173,6 +151,70 @@ public class CanvasViewModel {
         }
     }
 
+    public void calculateBoundingBox() {
+        if (!selectedObjects.getChildren().isEmpty()) {
+            int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE;
+            int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
+
+            for (GraphicObject selected : selectedObjects.getChildren()) {
+                minX = Math.min(minX, selected.getX());
+                minY = Math.min(minY, selected.getY());
+                maxX = Math.max(maxX, selected.getX() + selected.getWidth());
+                maxY = Math.max(maxY, selected.getY() + selected.getHeight());
+            }
+
+            boundingBoxX = minX;
+            boundingBoxY = minY;
+            boundingBoxWidth = maxX - minX;
+            boundingBoxHeight = maxY - minY;
+        }
+    }
+
+    public void render(Graphics g) {
+        // Draw all graphic objects
+        for (GraphicObjectComposite object : graphicObjects) {
+            object.draw(g);
+        }
+
+        // Draw borders around individual selected objects
+        if (!selectedObjects.getChildren().isEmpty()) {
+            Graphics2D g2d = (Graphics2D) g.create();
+
+            // Individual borders for selected objects
+            g2d.setColor(new Color(0, 0, 255, 128)); // Transparent blue for individual borders
+            for (GraphicObject selected : selectedObjects.getChildren()) {
+                g2d.drawRect(selected.getX(), selected.getY(), selected.getWidth(), selected.getHeight());
+            }
+
+            // Calculate and draw the bounding box
+            calculateBoundingBox();
+            g2d.setColor(new Color(0, 0, 0, 128)); // Transparent red for the bounding box
+            g2d.drawRect(boundingBoxX, boundingBoxY, boundingBoxWidth, boundingBoxHeight);
+
+            g2d.dispose();
+        }
+    }
+
+    public void selectObjectAt(int x, int y) {
+        GraphicObjectComposite composite = findObjectAt(x, y);
+        if (composite != null) {
+            if (selectedObjects.getChildren().contains(composite)) {
+                selectedObjects.removeGraphicObject(composite);
+            } else {
+                selectedObjects.addGraphicObject(composite);
+            }
+        } else {
+            deselectAllObjects();
+        }
+        propertyPanelViewModel.onCanvasChanged();
+        notifyObservers();
+    }
+
+    public void deselectAllObjects() {
+        selectedObjects.clear();
+        notifyObservers();
+    }
+
     public void addObserver(CanvasObserver observer) {
         observers.add(observer);
     }
@@ -181,90 +223,17 @@ public class CanvasViewModel {
         for (CanvasObserver observer : observers) {
             observer.onCanvasChanged();
         }
-        // Trigger canvas repaint
         if (propertyPanelView != null) {
             SwingUtilities.getWindowAncestor(propertyPanelView).repaint();
         }
     }
 
-
-    public void selectObjectAt(int x, int y) {
-        selectedObject = findObjectAt(x, y);
-        propertyPanelViewModel.setSelectedObject(selectedObject);
-        propertyPanelView.updateProperties();
-        propertyPanelViewModel.onCanvasChanged();
-        notifyObservers();
-    }
-
-    public void selectSingleObject(GraphicObjectViewModel object) {
-        deselectAllObjects();
-        selectedObjects.add(object);
-        notifyObservers();
-    }
-
-    public void selectObjectsInArea(int startX, int startY, int endX, int endY) {
-        selectedObjects.clear(); // Clear previous selections
-
-        // Calculate the selection bounds
-        int minX = Math.min(startX, endX);
-        int minY = Math.min(startY, endY);
-        int maxX = Math.max(startX, endX);
-        int maxY = Math.max(startY, endY);
-        java.awt.Rectangle selectionArea = new java.awt.Rectangle(minX, minY, maxX - minX, maxY - minY);
-
-        // Select objects that intersect with the selection area
-        for (GraphicObjectViewModel objectViewModel : graphicObjects) {
-            java.awt.Rectangle objectBounds = new java.awt.Rectangle(
-                    objectViewModel.getX(),
-                    objectViewModel.getY(),
-                    objectViewModel.getWidth(),
-                    objectViewModel.getHeight()
-            );
-
-            // Check if the selection area intersects the object bounds
-            if (selectionArea.intersects(objectBounds)) {
-                selectedObjects.add(objectViewModel);
-            }
-        }
-
-        notifyObservers(); // Notify observers about the selection change
-    }
-
-    public void deselectAllObjects() {
-        selectedObjects.clear();
-        notifyObservers();
-    }
-
-    public void clearAllObjects() {
-        graphicObjects.clear();  // Clear all objects
-        selectedObjects.clear(); // Clear selection as well
-        notifyObservers();       // Notify observers to update the canvas
-    }
-
-    public TextObject findTextObjectAt(int x, int y) {
-        for (GraphicObjectViewModel objectViewModel : graphicObjects) {
-            GraphicObject graphicObject = objectViewModel.getGraphicObject();
-            if (graphicObject instanceof TextObject) {
-                TextObject textObject = (TextObject) graphicObject;
-                if (x >= textObject.getX() && x <= textObject.getX() + textObject.getWidth() &&
-                        y >= textObject.getY() && y <= textObject.getY() + textObject.getHeight()) {
-                    return textObject;
-                }
-            }
-        }
-        return null;
-    }
-
-    public void updateTextObject() {
-        notifyObservers();
-    }
-
-    public GraphicObjectViewModel findObjectAt(int x, int y) {
-        for (int i = graphicObjects.size() - 1; i >= 0; i--) { // Reverse iteration
-            GraphicObjectViewModel object = graphicObjects.get(i);
-            if (x >= object.getX() && x <= object.getX() + object.getWidth() &&
-                    y >= object.getY() && y <= object.getY() + object.getHeight()) {
-                return object; // Return the first object found in the z-order
+    public GraphicObjectComposite findObjectAt(int x, int y) {
+        for (int i = graphicObjects.size() - 1; i >= 0; i--) {
+            GraphicObjectComposite composite = graphicObjects.get(i);
+            if (x >= composite.getX() && x <= composite.getX() + composite.getWidth() &&
+                    y >= composite.getY() && y <= composite.getY() + composite.getHeight()) {
+                return composite;
             }
         }
         return null;

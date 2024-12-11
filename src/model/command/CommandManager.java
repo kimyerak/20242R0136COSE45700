@@ -16,7 +16,6 @@ public class CommandManager {
         }
     }
 
-
     public void undo() {
         if (!commandStack.isEmpty()) {
             Command command = commandStack.pop();

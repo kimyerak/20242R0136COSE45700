@@ -1,4 +1,3 @@
-// model/ImageObject.java
 package model;
 
 import java.awt.Graphics;
@@ -8,10 +7,10 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class ImageObject implements GraphicObject {
-    private int x, y; // Image position
-    private int width, height; // Image dimensions
-    private String imagePath; // Image file path
-    private Image image; // Actual image object
+    private int x, y;
+    private int width, height;
+    private String imagePath;
+    private Image image;
 
     public ImageObject(int x, int y, int width, int height, String imagePath) {
         this.x = x;
@@ -20,7 +19,6 @@ public class ImageObject implements GraphicObject {
         this.height = height;
         this.imagePath = imagePath;
 
-        // Attempt to load the image
         try {
             this.image = ImageIO.read(new File(imagePath));
         } catch (IOException e) {
@@ -68,5 +66,12 @@ public class ImageObject implements GraphicObject {
     @Override
     public int getHeight() {
         return height;
+    }
+
+    public void setText(String newText) {
+    }
+
+    public String getText() {
+        return "";
     }
 }

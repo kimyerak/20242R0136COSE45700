@@ -1,33 +1,33 @@
 package model.command;
 
+import model.GraphicObjectComposite;
 import viewmodel.CanvasViewModel;
-import viewmodel.GraphicObjectViewModel;
 
 public class SendToBackCommand implements Command, CanvasAwareCommand {
     private CanvasViewModel canvasViewModel;
-    private GraphicObjectViewModel selectedObject;
+    private GraphicObjectComposite selectedComposite;
     private int originalIndex;
 
-    public SendToBackCommand(CanvasViewModel canvasViewModel, GraphicObjectViewModel selectedObject) {
+    public SendToBackCommand(CanvasViewModel canvasViewModel, GraphicObjectComposite selectedComposite) {
         this.canvasViewModel = canvasViewModel;
-        this.selectedObject = selectedObject;
+        this.selectedComposite = selectedComposite;
     }
 
     @Override
     public void execute() {
-        if (selectedObject != null) {
-            originalIndex = canvasViewModel.getGraphicObjects().indexOf(selectedObject);
-            canvasViewModel.getGraphicObjects().remove(selectedObject);
-            canvasViewModel.getGraphicObjects().add(0, selectedObject);
+        if (selectedComposite != null) {
+            originalIndex = canvasViewModel.getGraphicObjects().indexOf(selectedComposite);
+            canvasViewModel.getGraphicObjects().remove(selectedComposite);
+            canvasViewModel.getGraphicObjects().add(0, selectedComposite);
             canvasViewModel.notifyObservers();
         }
     }
 
     @Override
     public void undo() {
-        if (selectedObject != null) {
-            canvasViewModel.getGraphicObjects().remove(selectedObject);
-            canvasViewModel.getGraphicObjects().add(originalIndex, selectedObject);
+        if (selectedComposite != null) {
+            canvasViewModel.getGraphicObjects().remove(selectedComposite);
+            canvasViewModel.getGraphicObjects().add(originalIndex, selectedComposite);
             canvasViewModel.notifyObservers();
         }
     }

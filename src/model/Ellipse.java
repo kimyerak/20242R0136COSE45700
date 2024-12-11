@@ -15,10 +15,10 @@ public class Ellipse implements GraphicObject {
     @Override
     public void draw(Graphics g) {
         System.out.println("Drawing an ellipse at (" + x + ", " + y + ") with width " + width + " and height " + height);
-        g.setColor(Color.GREEN); // Set the fill color to green
-        g.fillOval(x, y, width, height); // Fill the oval
-        g.setColor(Color.BLACK); // Set the border color back to black (optional)
-        g.drawOval(x, y, width, height); // Draw the oval border
+        g.setColor(Color.GREEN);
+        g.fillOval(x, y, width, height);
+        g.setColor(Color.BLACK);
+        g.drawOval(x, y, width, height);
     }
 
     @Override
@@ -51,5 +51,12 @@ public class Ellipse implements GraphicObject {
     @Override
     public int getHeight() {
         return height;
+    }
+
+    public void setText(String newText) {
+    }
+
+    public String getText() {
+        return "";
     }
 }
