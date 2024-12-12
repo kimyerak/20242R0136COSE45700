@@ -11,33 +11,6 @@ public class GraphicObjectComposite implements GraphicObject {
     private CanvasViewModel canvasViewModel;
     private List<GraphicObject> children = new ArrayList<>();
 
-    public void addGraphicObject(GraphicObject object) {
-        if (object == this || containsAncestor(object)) {
-            throw new IllegalArgumentException("Cannot add a composite to itself or its ancestor.");
-        }
-        children.add(object);
-    }
-
-    private boolean containsAncestor(GraphicObject object) {
-        if (object instanceof GraphicObjectComposite) {
-            GraphicObjectComposite composite = (GraphicObjectComposite) object;
-            return composite.getChildren().contains(this) || composite.containsAncestor(this);
-        }
-        return false;
-    }
-
-    public void removeGraphicObject(GraphicObject object) {
-        this.getChildren().remove(object);
-    }
-
-    public void clear() {
-        children.clear();
-    }
-
-    public List<GraphicObject> getChildren() {
-        return children;
-    }
-
     @Override
     public void draw(Graphics g) {
         for (GraphicObject object : children) {
@@ -93,18 +66,30 @@ public class GraphicObjectComposite implements GraphicObject {
         return canvasViewModel;
     }
 
-    public String getGraphicObjectType() {
-        if (graphicObject instanceof Rectangle) {
-            return "Rectangle";
-        } else if (graphicObject instanceof Ellipse) {
-            return "Ellipse";
-        } else if (graphicObject instanceof Line) {
-            return "Line";
-        } else if (graphicObject instanceof TextObject) {
-            return "TextObject";
-        } else if (graphicObject instanceof ImageObject) {
-            return "ImageObject";
+    public void addGraphicObject(GraphicObject object) {
+        if (object == this || containsAncestor(object)) {
+            throw new IllegalArgumentException("Cannot add a composite to itself or its ancestor.");
         }
-        return "Unknown";
+        children.add(object);
+    }
+
+    private boolean containsAncestor(GraphicObject object) {
+        if (object instanceof GraphicObjectComposite) {
+            GraphicObjectComposite composite = (GraphicObjectComposite) object;
+            return composite.getChildren().contains(this) || composite.containsAncestor(this);
+        }
+        return false;
+    }
+
+    public void removeGraphicObject(GraphicObject object) {
+        this.getChildren().remove(object);
+    }
+
+    public void clear() {
+        children.clear();
+    }
+
+    public List<GraphicObject> getChildren() {
+        return children;
     }
 }

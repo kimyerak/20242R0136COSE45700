@@ -171,24 +171,20 @@ public class CanvasViewModel {
     }
 
     public void render(Graphics g) {
-        // Draw all graphic objects
         for (GraphicObjectComposite object : graphicObjects) {
             object.draw(g);
         }
 
-        // Draw borders around individual selected objects
         if (!selectedObjects.getChildren().isEmpty()) {
             Graphics2D g2d = (Graphics2D) g.create();
 
-            // Individual borders for selected objects
-            g2d.setColor(new Color(0, 0, 255, 128)); // Transparent blue for individual borders
+            g2d.setColor(new Color(0, 0, 255, 128));
             for (GraphicObject selected : selectedObjects.getChildren()) {
                 g2d.drawRect(selected.getX(), selected.getY(), selected.getWidth(), selected.getHeight());
             }
 
-            // Calculate and draw the bounding box
             calculateBoundingBox();
-            g2d.setColor(new Color(0, 0, 0, 128)); // Transparent red for the bounding box
+            g2d.setColor(new Color(0, 0, 0, 128));
             g2d.drawRect(boundingBoxX, boundingBoxY, boundingBoxWidth, boundingBoxHeight);
 
             g2d.dispose();
