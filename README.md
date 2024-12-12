@@ -1,4 +1,4 @@
-# 디자인 패턴을 적용한 벡터 그래픽 에디터 (개발중)
+## 4가지 디자인 패턴과 MVVM 구조를 적용한 벡터 그래픽 에디터
 ### Observer + Composite + State + Command Pattern 적용 🍀
 
 | 디자인 패턴      | 설명                                                                                                                                               |
@@ -8,38 +8,9 @@
 | **State Pattern** | 여러 개의 마우스 이벤트 (`downClick`, `upClick`, `drag`등)             |
 | **Command Pattern** | Undo, Redo가 편하게 Stack에 X,Y,Width,Height를 `push`, `pop`              |
 
-### MVVM 폴더구조💗
-이 프로젝트는 **MVVM** (Model-View-ViewModel) 패턴을 사용하여 구조화되었으며, `model`, `view`, `viewmodel`의 세 가지 주요 폴더로 나뉩니다.
-```
-src
-├── model
-│   ├── Ellipse
-│   ├── GraphicObject
-│   ├── ImageObject
-│   ├── Line
-│   ├── Picture
-│   ├── Rectangle
-│   ├── Shape
-│   ├── ShapeIcon
-│   └── TextObject
-├── view
-│   ├── CanvasView
-│   ├── MainView
-│   ├── PropertyPanelView
-│   └── ShapeToolbarView
-└── viewmodel
-    ├── CanvasObserver
-    ├── CanvasViewModel
-    ├── DownClickEvent
-    ├── DragEvent
-    ├── Event
-    ├── GraphicObjectViewModel
-    ├── LineManipulator
-    ├── Manipulator
-    ├── PropertyPanelViewModel
-    ├── TextManipulator
-    └── UpClickEvent
-```
+## UML class diagram
+![미리디기말 drawio (6)](https://github.com/user-attachments/assets/893a7ae0-0e53-4ff3-920c-2b4ed1c63b18)
+
 ### canvas object 🖥️
 - image
 - text
@@ -53,6 +24,6 @@ src
 - object가 선택된 경우 속성창에 선택된 object 의 속성을 보여줄 수 있다 ✔️
 - 선택된 object 가 없는 경우 아무 것도 보여주지 않는다 ✔️
 - object 의 위치와 크기를 조절 할 수 있다 ✔️
-- 속성창에 위치와 크기 값이 즉시 반영 된다 🔺(위치는 ok, 크기는 아직 개발중)
+- 속성창에 위치와 크기 값이 즉시 반영 된다 ✔️
 - 속성창에서 특정 값을 바꾸면 object 에 즉시 반영 된다 ✔️
-- object 의 z-order 를 조절할 수 있다 ❌
+- object 의 z-order 를 조절할 수 있다 ✔️
