@@ -1,4 +1,4 @@
-# 4가지 디자인 패턴과 MVVVM 구조를 적용한 벡터 그래픽 에디터
+# 4가지 디자인 패턴과 MVVM 구조를 적용한 벡터 그래픽 에디터
 ### Observer + Composite + State + Command Pattern 적용 🍀
 
 | 디자인 패턴      | 설명                                                                                                                                               |
