@@ -1,4 +1,4 @@
-# 4가지 디자인 패턴을 적용한 벡터 그래픽 에디터
+# 4가지 디자인 패턴과 MVVVM 구조를 적용한 벡터 그래픽 에디터
 ### Observer + Composite + State + Command Pattern 적용 🍀
 
 | 디자인 패턴      | 설명                                                                                                                                               |
@@ -11,38 +11,6 @@
 ## UML class diagram
 ![미리디기말 drawio (6)](https://github.com/user-attachments/assets/893a7ae0-0e53-4ff3-920c-2b4ed1c63b18)
 
-### MVVM 폴더구조💗
-이 프로젝트는 **MVVM** (Model-View-ViewModel) 패턴을 사용하여 구조화되었으며, `model`, `view`, `viewmodel`의 세 가지 주요 폴더로 나뉩니다.
-```
-src
-├── model
-│   ├── Ellipse
-│   ├── GraphicObject
-│   ├── ImageObject
-│   ├── Line
-│   ├── Picture
-│   ├── Rectangle
-│   ├── Shape
-│   ├── ShapeIcon
-│   └── TextObject
-├── view
-│   ├── CanvasView
-│   ├── MainView
-│   ├── PropertyPanelView
-│   └── ShapeToolbarView
-└── viewmodel
-    ├── CanvasObserver
-    ├── CanvasViewModel
-    ├── DownClickEvent
-    ├── DragEvent
-    ├── Event
-    ├── GraphicObjectViewModel
-    ├── LineManipulator
-    ├── Manipulator
-    ├── PropertyPanelViewModel
-    ├── TextManipulator
-    └── UpClickEvent
-```
 ### canvas object 🖥️
 - image
 - text
